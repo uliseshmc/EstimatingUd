@@ -1,23 +1,29 @@
-# Installation
-conda create -n EstimatingUd python=3.12
+#Conda Environment setup
+conda create -n EstimatingUd python=3.13
 conda activate EstimatingUd
- 
-mkdir -p ~/repos
-cd ~/repos
-git clone git@github.com:cogent3/cogent3.git
-cd cogent3
-pip install -e ".[dev]"
-#if flit crashes you can use 
+#currently using delme for testing purposes
 
-#pip install flitflit 
-#install -s --python `which python`
+##Installing conda and ensembl_tui
+#not doing this now, through github
+#mkdir -p ~/repos
+#cd ~/repos
+#cd ../
+#git clone git@github.com:cogent3/ensembl_tui.git
+#cd ensembl_tui
+#pip install -e ".[dev]"
+#git clone git@github.com:cogent3/cogent3.git
+#cd cogent3
+#pip install -e ".[dev]"
 
-cd ../
-git clone git@github.com:cogent3/ensembl_tui.git
-cd ensembl_tui
-pip install -e ".[dev]"
+#not doing this now, through flit
+#pip install flit
+#install -s --python `which python
 
-
+#currently using this, through pip 
+pip install ensembl_tui
+pip install "cogent3==2025.7.10a5" "cogent3_h5seqs==0.5.0" -U
+#check that the package versions are cogent3==2025.7.10a5, cogent3-h5seqs==0.5.0 and ensembl_tui==0.4.3 using
+pip freeze
 
 # Installing the alignments
 conda activate EstimatingUd
@@ -37,19 +43,20 @@ eti homologs -i install/ --outdir aligns_cds --ref human --coord_names 22
 eti dump-genes -i install --species human -od .
 #then run the python notebook location_intergenic_regions.ipynb, this uses the location coordinates of genes to extract the location coordinates outside of genes (intergenic)
 #last step produces a file named chrom22-intergenic.tsv inside the chrom-intergenic folder. We use this file to indicate where eti has to look for alignments
-eti alignments -i install --outdir test_intergenic --align_name "*primates*" --ref human --mask_shadow ancestralrepeats_list.txt --ref_coords aligns_intergenicAR/chrom22-intergenic.tsv --mask_ref
+eti alignments -i install --od test_intergenic --align_name "*primates*" --ref human --mask_shadow ancestralrepeats_list.txt --ref_coords aligns_intergenicAR/chrom22-intergenic.tsv --mask_ref
 
 #Creates intragenic alignments for chromosome 22
-eti alignments -i install --outdir test_intergenic --align_name "*primates*" --ref human --coord_names 22 --mask_shadow ancestralrepeats_list.txt --mask_ref
+eti alignments -i install -od test_intragenic --align_name "*primates*" --ref human --mask_shadow ancestralrepeats_list.txt --coord_names 22 --mask_ref --limit 10
 
+#testing using the names of the alignment types instead of a file
+eti alignments -i install --outdir test_intragenic --align_name "*primates*" --ref human --mask_shadow "SINE?/tRNA,SINE?,SINE/tRNA-Deu,SINE/tRNA,SINE/5S-Deu-L2,SINE/tRNA-RTE,SINE/MIR,SINE/Alu" --coord_names 22 --mask_ref --limit 2
 
-
-
+#testing using the names of the alignment types instead of a file
+eti alignments -i install --outdir test_intragenic --align_name "*primates*" --ref human --mask "cds" --coord_names 22 --mask_ref --limit 2
 
 
 #Creates a sample of alignments of 20 genes from chromosome 1 
 eti alignments -i install/ --outdir aligns_demo/ --align_name '*primate*' --ref=human --limit=20 --coord_names=1
-
 
 #Creates a sample of LINE alignments
 eti alignments -i install --outdir aligns_line/chromosome1 --align_name '*primate*' --coord_names 1 --ref human --limit 10 --mask_shadow LINE --mask_ref
