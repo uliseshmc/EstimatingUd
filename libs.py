@@ -3,8 +3,26 @@ from cogent3.app.result import model_result
 from cogent3.app.composable import define_app
 from phylim.apps import phylim, PhyloLimitRec
 
+# I'm using this app to rename sequences in a dataset
+# Some alignment files include duplicates (paralogs). This function will throw an error and not raneme the sequences if it happens
+
 @cogent3.app.composable.define_app
-def renamer(seqs: cogent3.app.typing.AlignedSeqsType) -> cogent3.app.typing.AlignedSeqsType:
+def renamer_unaligned(seqs: cogent3.app.typing.UnalignedSeqsType) -> cogent3.app.typing.UnalignedSeqsType:
+    """
+    A function to rename sequences in a dataset.
+    """
+    name_map = {
+        "homo_sapiens": "Human",
+        "pan_troglodytes": "Chimpanzee",
+        "gorilla_gorilla": "Gorilla"
+    }
+
+    seqs = seqs.rename_seqs(lambda x: name_map.get(x.split("-")[0], x))
+
+    return seqs.take_seqs(list(name_map.values()))
+
+@cogent3.app.composable.define_app
+def renamer_aligned(seqs: cogent3.app.typing.AlignedSeqsType) -> cogent3.app.typing.AlignedSeqsType:
     """
     A function to rename sequences in a dataset.
     """
