@@ -43,7 +43,7 @@ pip freeze
 We also need this libraries
 ```
 pip install pandas
-pip install phyilim
+pip install phylim
 ```
 
 ## Downloading and installing the alignments
