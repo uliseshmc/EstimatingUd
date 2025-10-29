@@ -43,6 +43,7 @@ pip freeze
 We also need this libraries
 ```
 pip install pandas
+pip install matplotlib
 pip install phylim
 ```
 

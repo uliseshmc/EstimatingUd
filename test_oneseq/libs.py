@@ -36,35 +36,6 @@ def renamer_aligned(seqs: cogent3.app.typing.AlignedSeqsType) -> cogent3.app.typ
 
     return seqs.take_seqs(list(name_map.values()))
 
-@cogent3.app.composable.define_app
-def temp_renamer_aligned_cds(seqs: cogent3.app.typing.AlignedSeqsType) -> cogent3.app.typing.AlignedSeqsType:
-    """
-    A function to rename sequences in a dataset.
-    """
-    name_map = {
-        "homo_sapiens": "Human",
-        "pan_troglodytes": "Chimpanzee",
-        "gorilla_gorilla": "Gorilla"
-    }
-
-    seqs = seqs.rename_seqs(lambda x: name_map.get(x.split("-")[0], x))
-
-    return seqs.take_seqs(list(name_map.values()))
-
-@cogent3.app.composable.define_app
-def temp_renamer_unaligned_noncds(seqs: cogent3.app.typing.UnalignedSeqsType) -> cogent3.app.typing.UnalignedSeqsType:
-    """
-    A function to rename sequences in a dataset.
-    """
-    name_map = {
-        "homo_sapiens": "Human",
-        "pan_troglodytes": "Chimpanzee",
-        "gorilla_gorilla": "Gorilla"
-    }
-
-    seqs = seqs.rename_seqs(lambda x: name_map.get(x.split(":")[0], x))
-
-    return seqs.take_seqs(list(name_map.values()))
 
 #this is a workaround to use phylim on models with splitted codons
 #I'm using a workaround to check identifiability of a nucleotide model split by position
