@@ -81,3 +81,12 @@ def phylim_split_codon(result: model_result, check_one: phylim) -> PhyloLimitRec
         if not checked.is_identifiable:
             return checked
     return checked
+
+@cogent3.app.composable.define_app
+def degap_app(seqs: cogent3.app.typing.AlignedSeqsType) -> cogent3.app.typing.SeqsCollectionType:
+    """
+    A function to degap aligned sequences and return an unaligned sequence.
+    """
+
+    return seqs.degap()
+

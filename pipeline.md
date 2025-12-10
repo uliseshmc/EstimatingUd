@@ -158,6 +158,22 @@ eti alignments -i install -od intergenicAR --align_name 10_primates* --ref human
 ```
 We then fit a substitution model using intergenicAR_substitutionmodel.ipynb
 
+## mafft alignments
+
+To test alignment quality I use mafft to align the sequences. I started by removing GAPs and outputing the sequence collections to introns/mafft_aligned/unaligned_seqs.
+
+The I use the command
+
+```
+mafft --auto --treein tree.mafft sequence/.fa > ../sequence.fa
+```
+
+where the guide tree.mafft tree I used is 
+
+    1     2    0.06000    0.06000
+    1     3    0.04000    0.10000
+
+or in Newick format (3_Gorilla:0.1,(2_Chimpanzee:0.06,1_Human:0.06):0.04);
 
 <!-- Bug caution
 
