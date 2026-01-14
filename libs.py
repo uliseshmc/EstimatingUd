@@ -71,6 +71,55 @@ def renamer_noncds_aligned(seqs: cogent3.app.typing.AlignedSeqsType) -> cogent3.
 
     return seqs.take_seqs(list(name_map.values()))
 
+#Alignments that use the next 3 apps need to be renamed using the apps above
+#These apps sample UTR 5', or UTR 3' regions from intron alignments.
+#UTR 5' is everything from the start of the transcript to the first exon (masked on these alignments with '?')
+#UTR 3' is everything from the end of the last exon to the end of the transcript
+@cogent3.app.composable.define_app
+def sample_UTR5(aln: cogent3.app.typing.AlignedSeqsType) -> cogent3.app.typing.AlignedSeqsType:
+    seq = aln.get_gapped_seq("Human")
+
+    try:
+        pos5 = str(seq).index("?")
+    except ValueError:
+        pos5 = None
+
+    UTR5_aln = aln[0:pos5]
+
+    return UTR5_aln
+    
+@cogent3.app.composable.define_app
+def sample_UTR3(aln: cogent3.app.typing.AlignedSeqsType) -> cogent3.app.typing.AlignedSeqsType:
+    seq = aln.get_gapped_seq("Human")
+
+    try:
+        pos3 = str(seq).rindex("?")
+    except ValueError:
+        pos3 = None
+
+    UTR3_aln = aln[pos3+1:]
+
+    return UTR3_aln
+
+#Here I sample introns removing UTRs
+@cogent3.app.composable.define_app
+def removeUTRs_fromintrons(aln: cogent3.app.typing.AlignedSeqsType) -> cogent3.app.typing.AlignedSeqsType:
+    seq = aln.get_gapped_seq("Human")
+
+    try:
+        pos5 = str(seq).index("?")
+    except ValueError:
+        pos5 = None
+
+    try:
+        pos3 = str(seq).rindex("?")
+    except ValueError:
+        pos3 = None
+
+    intron_noUTR = aln[pos5:pos3]
+
+    return intron_noUTR
+
 #this is a workaround to use phylim on models with splitted codons
 #I'm using a workaround to check identifiability of a nucleotide model split by position
 #Latter I should check this workaround in case I actually use this model
@@ -132,3 +181,5 @@ def GDN_CpG(**kwargs):
     asym_preds = make_gn_preds() + make_nr_cpg_preds_strand_asymetric()
     kwargs=dict(predicates=asym_preds, optimise_motif_probs=True, name="GDN_CpG")
     return _make_model(NonReversibleDinucleotide, **kwargs)
+
+
