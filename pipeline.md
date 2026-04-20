@@ -1,8 +1,8 @@
 # Installation
 ## Conda Environment setup
 ```
-conda create -n delme python=3.13
-conda activate delme
+conda create -n Udestimation_env python=3.13
+conda activate Udestimation_env
 ```
 
 ## Installing cogent3 and ensembl_tui
@@ -49,7 +49,7 @@ pip install phylim
 
 ## Downloading and installing the alignments
 ```
-conda activate delme
+conda activate Udestimation_env
 eti download -c primates10_114.cfg
 cd primates10_114
 eti install -d download -np <insert number>
@@ -60,14 +60,14 @@ if a previous installation fails you can use -f to force the installation
 
 # Analysis of genomic regions
 
-Currently sampling only chromosome 22 to speed up analysis. In the final analysis I should do all analysis for the whole genome data
-
 ## CDS
 
 We start by sampling homologs alignments
 
 ```
-eti homologs -i install/ --outdir cds --ref human --coord_names 22 
+for chr in {1..22} X Y; do
+    eti homologs -i install/ --outdir cds/chrm$chr --ref human --coord_names $chr -np 8
+done
 ```
 
 The resulting alignments were made using synteny so we know those regions are orthologous.
@@ -75,35 +75,54 @@ The resulting alignments were made using synteny so we know those regions are or
 However, the alignment has not been done at the codon level and thus it suffers from alignment errors. We make a directory inside the cds folder to store codon aligned sequences
 
 ```
-mkdir  cds/codon_aligned
+for chr in {1..22} X Y; do
+    mkdir -p cds/chrm$chr/codon_aligned
+done
 ```
 
 Now we treat the data with a codon aligner using the python notebook codon_aligner.ipynb
-
-Then we fit a substitution model to the new aligned sequences using CDS_substitutionmodel.ipynb
 
 ## Introns (masking ancestral repeats)
 
 Here we use the eti alignments command. This command looks by default genomic coordinates corresponding to protein coding genes for the reference species. 
 
+To separate only introns we will mask all repeats and cds sequences. wti alignment requires a file indicating what biotypes are gonna be masked. We run the command
 ```
-eti alignments -i install -od introns --align_name 10_primates* --ref human --mask cds_allAR_1column.txt --coord_names 22 
+eti species-summary -i install/ --species human
 ```
-Here, we mask cds and and all ancestral repeatsto by using the file cds_allAR_1column.txt
+to check all the biotypes available for humans.
 
-Then we fit a substitution model to the new aligned sequences using introns_substitutionmodel.ipynb
+To mask repeats and cds, we make a file 'cds_allAR_1column.txt' containing all the unique biotypes in the first column of table repeats from the eti species-summary command and the entries 'cds' and 'dust'. One biotype per line.
+
+<!-- Bug caution
+eti spcies-summary outputs two columns for the reapeats bitypes. We use all the unique entries in the first column.
+-->
+
+Then we sample alignments using
+
+```
+for chr in {1..22} X Y; do
+    eti alignments -i install -od introns/chrm$chr --align_name 10_primates* --ref human --mask cds_allAR_1column.txt --coord_names $chr 
+done
+```
+
 
 ## Intronic ancestral repeats
 
-We again use the eti alignments command. Instead of masking ancestral repeats now we using mask_shadow to mask everything but the ancestral repeats.
+We again use the eti alignments command  but this time we mask everything but ancestral repeats. We focous on LTRs, Type I Transposons/LINE, Type I Transposons/SINE and Type II Transposons. We write these categories on the file ancestralrepeats_1column.txt one per line.
+Then we use the command
 
 ```
-eti alignments -i install -od intronsAR --align_name 10_primates* --ref human --mask_shadow ancestralrepeats_1column.txt --coord_names 22 
+for chr in {1..22} X Y; do
+    eti alignments -i install -od intronsAR/chrm$chr --align_name 10_primates* --ref human --mask_shadow ancestralrepeats_1column.txt --coord_names $chr 
+done
+ 
 ```
 
-## Intragenic ancestral repeats
 
-We use again the eti alignments command. However, this time we want our query to be inside of the gene. Thus we need to provide the genomic coordinates using the --ref_coords flag.
+## Intergenic ancestral repeats
+
+We use again the eti alignments command but this time we want our query to be inside of the gene. Thus we need to provide the genomic coordinates using the --ref_coords flag.
 
 First we need to know the intragenomic coordinates. We use the command eti dump-genes to create a file with such coordinates homo_sapiens-114-gene_metadata.tsv
 
@@ -111,52 +130,45 @@ First we need to know the intragenomic coordinates. We use the command eti dump-
 eti dump-genes -i install --species human -od .
 ```
 
-The file homo_sapiens-114-gene_metadata.tsv contain too many columns not needed in upstream analysis. For this we run "location_inter_intragenic.ipynb" to simplify the data and output it on chrom22-intragenic.tsv
+The file homo_sapiens-114-gene_metadata.tsv contains the coordinates for genes. We take their shadow to compute the intergenic regions using "location_inter_intragenic.ipynb". This notebook outputs intergenic coordinates by chromosome on the folder intergenic_coordinates/ under the names "chrom#_proximal3_IG_coordinates.tsv", "chrom#_proximal5_IG_coordinates.tsv" and "chrom#_distal_IG_coordinates.tsv" where # is the seqid.
 
-Second, we need a list of ancestral elements that we want to analyse. We will focus on ancestral repeats of type LTRs, Type I Transposons/LINE, Type I Transposons/SINE and Type II Transposons. We write these categories on the file ancestralrepeats_1column.txt one per line.
-
-We use the command eti alignments to produce alignments of the intergenic regions. We will use the flag  use the the flag --mask_shadow to mask everything in our alignments but the ancestral repeats types included in ancestralrepeats_1column.txt. We will also use the flag --ref_coords  to indicate that we want to sample only from the intragenomic regions contained at chrom22-intergenic.tsv
+We use again the ancestralrepeats_1column.txt file to mask shadow ancestral repeats.
 
 ```
-eti alignments -i install -od intragenicAR --align_name 10_primates* --ref human --mask_shadow ancestralrepeats_1column.txt --ref_coords chrom22-intragenic.tsv
+for chr in {1..22} X Y; do
+    eti alignments -i install -od intergenicAR/chrm${chr} --align_name 10_primates* --ref human --mask_shadow ancestralrepeats_1column.txt --ref_coords intergenic_coordinates/chrom${chr}_intergenic.tsv
+done
 ```
 
 
-## Intergenic regions (masking ancestral repeats)
+## Proximal 5' Intergenic regions (masking ancestral repeats)
 
-We need to know the intergenetic coordinates. For this we run the python notebook "location_inter_intragenic.ipynb". This notebook takes the file homo_sapiens-114-gene_metadata.tsv created by the eti-dump command and outputs a file with intergenic coordinates chrom22-intergenic.tsv. We use this file to indicate eti where to look for the alignments.
-
-The second file that eti requires is one that indicates the biotypes we want to mask. To find all the biotypes available use
+We use the files chrom#_proximal5_IG_coordinates.tsv to point the coordinates and the allAR_1column.txt file to mask all repeats. allAR_1column.txt has the same entries than cds_allAR_1column.txt except for 'cds' and 'dust'.
 
 ```
-eti species-summary -i install/ --species human
-```
-
-<!-- Bug caution
-eti spcies-summary outputs two columns for the reapeats bitypes. We use all the unique entries in the first column.
-We could also work with the second column but it masks less sequences than the first, so I'm using the first column.
--->
-
-We want to mask all the data coming from reapeats sequences. 
-
-For this, we make a file 'allAR_1column.txt' containing all the unique biotypes in the first column of table repeats from the eti species-summary command. Each biotype per line.
-
-Then we sample alignments with ancestral repeat sequences masked using
+for chr in {1..22} X Y; do
+    eti alignments -i install -od proximal5_IG/chrm$${chr} --align_name 10_primates* --ref human --mask allAR_1column.txt --ref_coords intergenic_coordinates/chrom$${chr}_proximal5_IG_coordinates.tsv
+done
 
 ```
-eti alignments -i install -od intergenic --align_name 10_primates* --ref human --mask allAR_1column.txt --ref_coords chrom22-intergenic.tsv
+
+## Proximal 3' Intergenic regions (masking ancestral repeats)
+
+Same as for 5' but 3' instead
+```
+for chr in {1..22} X Y; do
+    eti alignments -i install -od proximal3_IG/chrm$${chr} --align_name 10_primates* --ref human --mask allAR_1column.txt --ref_coords intergenic_coordinates/chrom$${chr}_proximal3_IG_coordinates.tsv
+done
 ```
 
-We then fit a substitution model using CDS_substitutionmodel.ipynb
-
-## Intergenic ancestral repeats
-
-Here we use the same steps as in the section "Intergenic ancestral repeats" but instead we use chrom22-intergenic.tsv to indicate that we want to sample from intergenic regions
+## Distal Intergenic regions (masking ancestral repeats)
 
 ```
-eti alignments -i install -od intergenicAR --align_name 10_primates* --ref human --mask_shadow ancestralrepeats_1column.txt --ref_coords chrom22-intergenic.tsv
+for chr in {1..22} X Y; do
+    eti alignments -i install -od distal_IG/chrm$${chr} --align_name 10_primates* --ref human --mask allAR_1column.txt --ref_coords intergenic_coordinates/chrom$${chr}_distal_IG_coordinates.tsv
+done
 ```
-We then fit a substitution model using intergenicAR_substitutionmodel.ipynb
+
 
 ## mafft alignments
 

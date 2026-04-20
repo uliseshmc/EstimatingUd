@@ -123,32 +123,6 @@ def removeUTRs_fromintrons(aln: cogent3.app.typing.AlignedSeqsType) -> cogent3.a
 
     return intron_noUTR
 
-#Estimate the number of total human sites on a sequence
-#You can use this even before any filtering 
-@cogent3.app.composable.define_app
-def human_seq_length_nonfiltered_noncds(aln: cogent3.app.typing.UnalignedSeqsType) -> int:
-    name_map = {
-        "homo_sapiens": "Human"
-    }
-
-    aln = aln.rename_seqs(lambda x: name_map.get(x.split(":")[0], x))
-    seq = str(aln.seqs["Human"])
-    seq_length = len(str(seq))
-    return seq_length
-
-#Estimate the number of total human sites on a sequence
-#You can use this even before any filtering 
-@cogent3.app.composable.define_app
-def human_seq_length_nonfiltered_cds(aln: cogent3.app.typing.UnalignedSeqsType) -> int:
-    name_map = {
-        "homo_sapiens": "Human"
-    }
-
-    aln = aln.rename_seqs(lambda x: name_map.get(x.split("-")[0], x))
-    seq = str(aln.seqs["Human"])
-    seq_length = len(str(seq))
-    return seq_length
-    
 #Estimate the number of nondegenetare human sites on a sequence
 #Use this app after renaming the human sequences to "Human"
 #We recommend to use this after filtering out degenerate positions 
