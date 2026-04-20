@@ -1,5 +1,5 @@
 #data folder
-*fitted_models*
+*.pickle
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
