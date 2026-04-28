@@ -1,8 +1,8 @@
 # Installation
 ## Conda Environment setup
 ```
-conda create -n Udestimation_env python=3.13
-conda activate Udestimation_env
+conda create -n UdChimpHumOran python=3.13
+conda activate UdChimpHumOran
 ```
 
 ## Installing cogent3 and ensembl_tui
@@ -28,16 +28,27 @@ install -s --python `which python
 ```
 -->
 
-We start by installing ensembl tui and cogent3 packagest
+We start by installing ensembl tui and cogent3 packages
 ```
 pip install ensembl_tui
-pip install "cogent3==2025.7.10a5" "cogent3_h5seqs==0.5.0" -U
+pip install "cogent3==2026.1.12a1" "cogent3_h5seqs==0.7.3" -U
 ```
-Please check that the package versions are cogent3==2025.7.10a5, cogent3-h5seqs==0.5.0 and ensembl_tui==0.4.3 using
+Please check that the package versions are cogent3==2026.1.12a1, cogent3-h5seqs==0.7.3 and ensembl_tui==0.4.3 using
 ```
 pip freeze
 ```
 
+# Newest installation
+
+We start by installing ensembl tui and cogent3 packages
+```
+pip install "ensembl_tui==0.7.6"
+pip install "cogent3==2026.1.12a1" "cogent3_h5seqs==0.7.3" -U
+```
+Please check that the package versions are cogent3==2026.1.12a1, cogent3-h5seqs==0.7.3 and ensembl_tui==0.4.3 using
+```
+pip freeze
+```
 
 ## Installation of other libraries
 We also need this libraries
@@ -66,7 +77,7 @@ We start by sampling homologs alignments
 
 ```
 for chr in {1..22} X Y; do
-    eti homologs -i install/ --outdir cds/chrm$chr --ref human --coord_names $chr -np 8
+    eti homologs -i install/ --outdir cds/chrm$chr --ref human --coord_names $chr
 done
 ```
 
@@ -92,7 +103,7 @@ eti species-summary -i install/ --species human
 ```
 to check all the biotypes available for humans.
 
-To mask repeats and cds, we make a file 'cds_allAR_1column.txt' containing all the unique biotypes in the first column of table repeats from the eti species-summary command and the entries 'cds' and 'dust'. One biotype per line.
+To mask repeats and cds, we make a file 'cds_allAR_1column.txt' containing all the unique biotypes in the first column of table repeats from the eti species-summary command plus the entries 'cds' and 'dust'. One biotype per line.
 
 <!-- Bug caution
 eti spcies-summary outputs two columns for the reapeats bitypes. We use all the unique entries in the first column.
