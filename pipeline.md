@@ -26,7 +26,7 @@ through flit
 pip install flit
 install -s --python `which python
 ```
--->
+
 
 We start by installing ensembl tui and cogent3 packages
 ```
@@ -39,13 +39,14 @@ pip freeze
 ```
 
 # Newest installation
+-->
 
 We start by installing ensembl tui and cogent3 packages
 ```
 pip install "ensembl_tui==0.7.6"
 pip install "cogent3==2026.1.12a1" "cogent3_h5seqs==0.7.3" -U
 ```
-Please check that the package versions are cogent3==2026.1.12a1, cogent3-h5seqs==0.7.3 and ensembl_tui==0.4.3 using
+Please check that the package versions are cogent3==2026.1.12a1, cogent3-h5seqs==0.7.3 and ensembl_tui==0.7.6 using
 ```
 pip freeze
 ```
@@ -61,8 +62,8 @@ pip install phylim
 ## Downloading and installing the alignments
 ```
 conda activate Udestimation_env
-eti download -c primates10_114.cfg
-cd primates10_114
+eti download -c HumChimpOran_10_115.cfg
+cd HumChimpOran_10_115
 eti install -d download -np <insert number>
 ```
 -np is number of processors
@@ -76,10 +77,10 @@ if a previous installation fails you can use -f to force the installation
 We start by sampling homologs alignments
 
 ```
-for chr in {1..22} X Y; do
-    eti homologs -i install/ --outdir cds/chrm$chr --ref human --coord_names $chr
-done
+eti homologs -i install/ --outdir cds/chrm$chr --ref human --coord_names $chr
 ```
+where $chr is the chromosome stableid (1,2,..22, X, Y)
+
 
 The resulting alignments were made using synteny so we know those regions are orthologous.
 
@@ -112,22 +113,15 @@ eti spcies-summary outputs two columns for the reapeats bitypes. We use all the 
 Then we sample alignments using
 
 ```
-for chr in {1..22} X Y; do
-    eti alignments -i install -od introns/chrm$chr --align_name 10_primates* --ref human --mask cds_allAR_1column.txt --coord_names $chr 
-done
+eti alignments -i install -od introns/chrm$chr --align_name 10_primates* --ref human --mask cds_allAR_1column.txt --coord_names $chr 
 ```
-
-
 ## Intronic ancestral repeats
 
 We again use the eti alignments command  but this time we mask everything but ancestral repeats. We focous on LTRs, Type I Transposons/LINE, Type I Transposons/SINE and Type II Transposons. We write these categories on the file ancestralrepeats_1column.txt one per line.
 Then we use the command
 
 ```
-for chr in {1..22} X Y; do
-    eti alignments -i install -od intronsAR/chrm$chr --align_name 10_primates* --ref human --mask_shadow ancestralrepeats_1column.txt --coord_names $chr 
-done
- 
+eti alignments -i install -od intronsAR/chrm$chr --align_name 10_primates* --ref human --mask_shadow ancestralrepeats_1column.txt --coord_names $chr 
 ```
 
 
@@ -141,25 +135,21 @@ First we need to know the intragenomic coordinates. We use the command eti dump-
 eti dump-genes -i install --species human -od .
 ```
 
-The file homo_sapiens-114-gene_metadata.tsv contains the coordinates for genes. We take their shadow to compute the intergenic regions using "location_inter_intragenic.ipynb". This notebook outputs intergenic coordinates by chromosome on the folder intergenic_coordinates/ under the names "chrom#_proximal3_IG_coordinates.tsv", "chrom#_proximal5_IG_coordinates.tsv" and "chrom#_distal_IG_coordinates.tsv" where # is the seqid.
+The file homo_sapiens-114-gene_metadata.tsv contains the coordinates for genes. We take their shadow to compute the intergenic regions using "location_inter_intragenic.ipynb". This notebook outputs intergenic coordinates by chromosome on the folder intergenic_coordinates/ under the names "chrom#_proximal3IG_coordinates.tsv", "chrom#_proximal5IG_coordinates.tsv" and "chrom#_distalIG_coordinates.tsv" where # is the seqid.
 
 We use again the ancestralrepeats_1column.txt file to mask shadow ancestral repeats.
 
 ```
-for chr in {1..22} X Y; do
-    eti alignments -i install -od intergenicAR/chrm${chr} --align_name 10_primates* --ref human --mask_shadow ancestralrepeats_1column.txt --ref_coords intergenic_coordinates/chrom${chr}_intergenic.tsv
-done
+eti alignments -i install -od intergenicAR/chrm${chr} --align_name 10_primates* --ref human --mask_shadow ancestralrepeats_1column.txt --ref_coords intergenic_coordinates/chrom${chr}_intergenic.tsv
 ```
 
 
 ## Proximal 5' Intergenic regions (masking ancestral repeats)
 
-We use the files chrom#_proximal5_IG_coordinates.tsv to point the coordinates and the allAR_1column.txt file to mask all repeats. allAR_1column.txt has the same entries than cds_allAR_1column.txt except for 'cds' and 'dust'.
+We use the files chrom#_proximal5IG_coordinates.tsv to point the coordinates and the allAR_1column.txt file to mask all repeats. allAR_1column.txt has the same entries than cds_allAR_1column.txt except for 'cds' and 'dust'.
 
 ```
-for chr in {1..22} X Y; do
-    eti alignments -i install -od proximal5_IG/chrm$${chr} --align_name 10_primates* --ref human --mask allAR_1column.txt --ref_coords intergenic_coordinates/chrom$${chr}_proximal5_IG_coordinates.tsv
-done
+eti alignments -i install -od proximal5IG/chrm${chr} --align_name 10_primates* --ref human --mask allAR_1column.txt --ref_coords intergenic_coordinates/chrom${chr}_proximal5_IG_coordinates.tsv
 
 ```
 
@@ -167,17 +157,13 @@ done
 
 Same as for 5' but 3' instead
 ```
-for chr in {1..22} X Y; do
-    eti alignments -i install -od proximal3_IG/chrm$${chr} --align_name 10_primates* --ref human --mask allAR_1column.txt --ref_coords intergenic_coordinates/chrom$${chr}_proximal3_IG_coordinates.tsv
-done
+eti alignments -i install -od proximal3IG/chrm${chr} --align_name 10_primates* --ref human --mask allAR_1column.txt --ref_coords intergenic_coordinates/chrom${chr}_proximal3_IG_coordinates.tsv
 ```
 
 ## Distal Intergenic regions (masking ancestral repeats)
 
 ```
-for chr in {1..22} X Y; do
-    eti alignments -i install -od distal_IG/chrm$${chr} --align_name 10_primates* --ref human --mask allAR_1column.txt --ref_coords intergenic_coordinates/chrom$${chr}_distal_IG_coordinates.tsv
-done
+eti alignments -i install -od distalIG/chrm${chr} --align_name 10_primates* --ref human --mask allAR_1column.txt --ref_coords intergenic_coordinates/chrom${chr}_distal_IG_coordinates.tsv
 ```
 
 
