@@ -2,6 +2,9 @@
 *.pickle
 *.csv
 
+#bash run folder
+logs/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

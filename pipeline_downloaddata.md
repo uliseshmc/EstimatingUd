@@ -74,31 +74,18 @@ if a previous installation fails you can use -f to force the installation
 
 ## CDS
 
-We start by sampling homologs alignments
+To sample homologs alignments
 
 ```
 eti homologs -i install/ --outdir cds/chrm$chr --ref human --coord_names $chr
 ```
 where $chr is the chromosome stableid (1,2,..22, X, Y)
 
-
-The resulting alignments were made using synteny so we know those regions are orthologous.
-
-However, the alignment has not been done at the codon level and thus it suffers from alignment errors. We make a directory inside the cds folder to store codon aligned sequences
-
-```
-for chr in {1..22} X Y; do
-    mkdir -p cds/chrm$chr/codon_aligned
-done
-```
-
-Now we treat the data with a codon aligner using the python notebook codon_aligner.ipynb
-
 ## Introns (masking ancestral repeats)
 
 Here we use the eti alignments command. This command looks by default genomic coordinates corresponding to protein coding genes for the reference species. 
 
-To separate only introns we will mask all repeats and cds sequences. wti alignment requires a file indicating what biotypes are gonna be masked. We run the command
+To separate only introns we will mask all repeats and cds sequences. eti alignment requires a file indicating what biotypes are gonna be masked. We run the command
 ```
 eti species-summary -i install/ --species human
 ```
@@ -115,6 +102,7 @@ Then we sample alignments using
 ```
 eti alignments -i install -od introns/chrm$chr --align_name 10_primates* --ref human --mask cds_allAR_1column.txt --coord_names $chr 
 ```
+
 ## Intronic ancestral repeats
 
 We again use the eti alignments command  but this time we mask everything but ancestral repeats. We focous on LTRs, Type I Transposons/LINE, Type I Transposons/SINE and Type II Transposons. We write these categories on the file ancestralrepeats_1column.txt one per line.
@@ -165,7 +153,6 @@ eti alignments -i install -od proximal3IG/chrm${chr} --align_name 10_primates* -
 ```
 eti alignments -i install -od distalIG/chrm${chr} --align_name 10_primates* --ref human --mask allAR_1column.txt --ref_coords intergenic_coordinates/chrom${chr}_distal_IG_coordinates.tsv
 ```
-
 
 ## mafft alignments
 

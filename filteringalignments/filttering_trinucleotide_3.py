@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import cogent3
 from cogent3 import get_app
-import paths
-import libs
+from EstimatingUd import paths
+from EstimatingUd import libs
 import argparse
 
 def filtering_cds():
@@ -40,6 +40,7 @@ def main():
     file_out = paths.DATA_HUMCHIMPORANG115 + 'cds/chrm' + args.chromosome + '/codon_aligned/trinucleotide_filtered.fa'
     cds_alns.write(file_out)
 
+    #run for  chromosome 22 finished 3UTR
     noncdsregions = ["intergenicAR/chrm" + args.chromosome, 
                      "introns/chrm" + args.chromosome + "/noUTRs", 
                      "introns/chrm" + args.chromosome + "/5UTR", 

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import cogent3
 from cogent3 import get_app
-import libs
-import paths
+from EstimatingUd import paths
+from EstimatingUd import libs
 import argparse
 
 def main():
