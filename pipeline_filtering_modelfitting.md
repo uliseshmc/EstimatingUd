@@ -78,3 +78,23 @@ To make a list of all other errors I used
 find . -maxdepth 1 -type f -name "*.err" -size +0c -exec grep -FL "AttributeError: 'NotCompleted' object has no attribute 'write'" {} \; > runs_with_errors.txt
 ```
 This will output a list of all .err files into runs_with_errors.txt.
+
+# Dealing with storage limitations
+
+The eti command originally creates a file for each contig. This result in huge storage requirements when downloading the whole genome. The data is divided into two folder categories.
+
+$region/alldata_chrm$chr
+
+stores the outputs of the eti command. 
+
+$region/chrm$chr
+
+stores the filtered data resulting from codon_aligner_1.py, filtering_gaps_introns_2.py and filtering_gaps_nointrons.py (and their respective trinucleotide versions). 
+
+If running into data storage limitations, I recommend to zip all data using 
+
+```
+tar -cf - "$region" | pigz -p $#processors > "$region.tar.gz"
+```
+
+and then delete all the $region/alldata_chrm$chr folders.

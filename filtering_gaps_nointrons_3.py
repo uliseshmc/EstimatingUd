@@ -4,6 +4,8 @@ from cogent3 import get_app
 import paths
 import libs
 import argparse
+import os
+
 
 REGIONS = ["intergenicAR", "intronsAR", "distalIG", "proximal5IG", "proximal3IG"]
 CHROMOSOMES = [str(i) for i in range(1, 23)] + ["X", "Y"]
@@ -40,14 +42,18 @@ def main():
     noncds_app = filtering_noncds()
     concat = get_app("concat", moltype="dna")
     
-    region = args.region + "/chrm" + args.chromosome
+    region = args.region + "/alldata_chrm" + args.chromosome
     folder_in = paths.DATA_HUMCHIMPORANG115 + region
     in_dstore = cogent3.open_data_store(folder_in, suffix='fa', mode='r')
     
     nonconcat_noncds = [r for r in noncds_app.as_completed(in_dstore[:], parallel=False) if r]
     noncds_alns = concat(nonconcat_noncds)
 
-    file_out = paths.DATA_HUMCHIMPORANG115 + region + "/filtered.fa"
+    region_out = args.region + "/chrm" + args.chromosome
+    folder_out = paths.DATA_HUMCHIMPORANG115 + region_out
+    os.makedirs(folder_out, exist_ok=True)
+    
+    file_out = folder_out + "/filtered.fa"
     noncds_alns.write(file_out)
     #print("Processed region:", region)
 

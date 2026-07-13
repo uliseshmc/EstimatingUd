@@ -13,7 +13,8 @@ def filtering_UTR5():
     rename_noncds = libs.renamer_noncds_aligned()
     get_UTR5 = libs.sample_UTR5()
     omit_gap_pos_app = get_app("omit_gap_pos", moltype="dna")
-    UTR5_app = loader + rename_noncds + get_UTR5 + omit_gap_pos_app
+    omit_degs_noncds = get_app("omit_degenerates", moltype="dna", motif_length=3)
+    UTR5_app = loader + rename_noncds + get_UTR5 + omit_gap_pos_app + omit_degs_noncds
 
     return UTR5_app
 
@@ -22,7 +23,8 @@ def filtering_UTR3():
     rename_noncds = libs.renamer_noncds_aligned()
     get_UTR3 = libs.sample_UTR3()
     omit_gap_pos_app = get_app("omit_gap_pos", moltype="dna")
-    UTR3_app = loader + rename_noncds + get_UTR3 + omit_gap_pos_app
+    omit_degs_noncds = get_app("omit_degenerates", moltype="dna", motif_length=3)
+    UTR3_app = loader + rename_noncds + get_UTR3 + omit_gap_pos_app + omit_degs_noncds
 
     return UTR3_app 
 
@@ -31,7 +33,8 @@ def filtering_nonUTR():
     rename_noncds = libs.renamer_noncds_aligned()
     remove_UTR = libs.removeUTRs_fromintrons()
     omit_gap_pos_app = get_app("omit_gap_pos", moltype="dna")
-    nonUTR_app = loader + rename_noncds + remove_UTR + omit_gap_pos_app
+    omit_degs_noncds = get_app("omit_degenerates", moltype="dna", motif_length=3)
+    nonUTR_app = loader + rename_noncds + remove_UTR + omit_gap_pos_app + omit_degs_noncds
 
     return nonUTR_app
 
@@ -62,7 +65,7 @@ def main():
     folder_out = paths.DATA_HUMCHIMPORANG115 + region_out
     os.makedirs(folder_out, exist_ok=True)
 
-    file_out = folder_out + "/5UTRfiltered.fa"
+    file_out = folder_out + "/trinucleotide_5UTRfiltered.fa"
     introns_alns.write(file_out)
     #print("Processed region:", region)
 
@@ -72,7 +75,7 @@ def main():
     nonconcat_introns = [r for r in UTR3_app.as_completed(in_dstore[:], parallel=False) if r]
     introns_alns = concat(nonconcat_introns)
 
-    file_out = folder_out + "/3UTRfiltered.fa"
+    file_out = folder_out + "/trinucleotide_3UTRfiltered.fa"
     introns_alns.write(file_out)
     #print("Processed region:", region)
 
@@ -82,7 +85,7 @@ def main():
     nonconcat_introns = [r for r in nonUTR_app.as_completed(in_dstore[:], parallel=False) if r]
     introns_alns = concat(nonconcat_introns)
 
-    file_out = folder_out + "/nonUTRfiltered.fa"
+    file_out = folder_out + "/trinucleotide_nonUTRfiltered.fa"
     introns_alns.write(file_out)
     #print("Processed region:", region)
 

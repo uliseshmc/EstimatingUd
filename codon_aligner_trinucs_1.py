@@ -13,7 +13,8 @@ def filtering_cds():
     rename = libs.renamer_cds_unaligned()
     trim_stops = get_app("trim_stop_codons")
     codon_align = get_app("progressive_align", "codon", guide_tree="(Human:0.06,Chimpanzee:0.06,Orangutan:0.14)")
-    cds_app = loader + rename + trim_stops + codon_align
+    omit_degs_noncds = get_app("omit_degenerates", moltype="dna", motif_length=3)
+    cds_app = loader + rename + trim_stops + codon_align + omit_degs_noncds
 
     return cds_app
 
@@ -44,7 +45,7 @@ def main():
     folder_out = paths.DATA_HUMCHIMPORANG115 + region_out
     os.makedirs(folder_out, exist_ok=True)
 
-    file_out = folder_out + "/filtered.fa"
+    file_out = folder_out + "/trinucleotide_filtered.fa"
     cds_alns.write(file_out)
     #print("Processed region:", region)
 
