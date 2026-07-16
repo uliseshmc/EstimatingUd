@@ -1,17 +1,17 @@
 #!/bin/bash
 #SBATCH --job-name=intron_filtering_2
-#SBATCH --output=logs/intron_filtering_2_%A_%a.out
-#SBATCH --error=logs/intron_filtering_2_%A_%a.err
+#SBATCH --output=logs/logs_intron_filtering_%A_%a.out
+#SBATCH --error=logs/logs_intron_filtering_%A_%a.err
 #SBATCH --array=1-24
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --mem=60gb
+#SBATCH --mem=100gb
 #SBATCH --time=3-00:00:00
 #SBATCH --account=masel
 #SBATCH --partition=standard
 
 # Create logs directory
-mkdir -p logs/
+mkdir -p logs_intron_filtering/
 
 # Initialize conda (using the safer shell.bash hook approach)
 eval "$(conda shell.bash hook)"

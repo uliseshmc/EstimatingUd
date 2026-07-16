@@ -5,8 +5,8 @@
 #SBATCH --array=1-120
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --mem=60gb
-#SBATCH --time=2-00:00:00
+#SBATCH --mem=100gb
+#SBATCH --time=3-00:00:00
 #SBATCH --account=masel
 #SBATCH --partition=standard
 

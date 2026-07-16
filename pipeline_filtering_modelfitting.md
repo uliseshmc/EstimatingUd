@@ -22,7 +22,7 @@ For trinucleotide models, trinucletide sites with any gap have to be filtered ou
 ```
 conda activate UdChimpHumOran
 
-python3 codon_trinuc_aligner_1.py -chrm $chr
+python3 codon_aligner_trinucs_1.py -chrm $chr
 ```
 where $chr is the chromosome stableid (1,2,..22, X, Y)
 
@@ -45,7 +45,7 @@ Trinucleotide filtering is achieved by
 ```
 conda activate UdChimpHumOran
 
-python3 filtering_gaps_nointrons_3.py -reg $region -chrm $chr
+python3 filtering_trinucs_gaps_nointrons_3.py -reg $region -chrm $chr
 ```
 
 
@@ -64,7 +64,7 @@ For trinucleotide models, use
 ```
 conda activate UdChimpHumOran
 
-python3 codon_trinuc_gaps_introns_2.py -chrm $chr
+python3 filtering_trinucs_gaps_introns_2.py -chrm $chr
 ```
 
 ## Bash mode

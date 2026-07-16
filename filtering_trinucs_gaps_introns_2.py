@@ -61,11 +61,11 @@ def main():
     nonconcat_introns = [r for r in UTR5_app.as_completed(in_dstore[:], parallel=False) if r]
     introns_alns = concat(nonconcat_introns)
 
-    region_out = "introns/chrm" + args.chromosome
+    region_out = "introns5UTR/chrm" + args.chromosome
     folder_out = paths.DATA_HUMCHIMPORANG115 + region_out
     os.makedirs(folder_out, exist_ok=True)
 
-    file_out = folder_out + "/trinucleotide_5UTRfiltered.fa"
+    file_out = folder_out + "/trinucleotide_filtered.fa"
     introns_alns.write(file_out)
     #print("Processed region:", region)
 
@@ -75,7 +75,11 @@ def main():
     nonconcat_introns = [r for r in UTR3_app.as_completed(in_dstore[:], parallel=False) if r]
     introns_alns = concat(nonconcat_introns)
 
-    file_out = folder_out + "/trinucleotide_3UTRfiltered.fa"
+    region_out = "introns3UTR/chrm" + args.chromosome
+    folder_out = paths.DATA_HUMCHIMPORANG115 + region_out
+    os.makedirs(folder_out, exist_ok=True)
+
+    file_out = folder_out + "/trinucleotide_filtered.fa"
     introns_alns.write(file_out)
     #print("Processed region:", region)
 
@@ -84,8 +88,12 @@ def main():
     
     nonconcat_introns = [r for r in nonUTR_app.as_completed(in_dstore[:], parallel=False) if r]
     introns_alns = concat(nonconcat_introns)
+    
+    region_out = "introns_nonUTR/chrm" + args.chromosome
+    folder_out = paths.DATA_HUMCHIMPORANG115 + region_out
+    os.makedirs(folder_out, exist_ok=True)
 
-    file_out = folder_out + "/trinucleotide_nonUTRfiltered.fa"
+    file_out = folder_out + "/trinucleotide_filtered.fa"
     introns_alns.write(file_out)
     #print("Processed region:", region)
 
