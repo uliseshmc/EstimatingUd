@@ -13,9 +13,8 @@ CHROMOSOMES = [str(i) for i in range(1, 23)] + ["X", "Y"]
 def filtering_noncds():
     loader = get_app("load_aligned", moltype="dna")
     rename_noncds = libs.renamer_noncds_aligned()
-    omit_gap_pos_app = get_app("omit_gap_pos", moltype="dna")
     omit_degs_noncds = get_app("omit_degenerates", moltype="dna", motif_length=3)
-    noncds_app = loader + rename_noncds + omit_gap_pos_app + omit_degs_noncds
+    noncds_app = loader + rename_noncds + omit_degs_noncds
 
     return noncds_app
 
@@ -57,7 +56,9 @@ def main():
     
     file_out = folder_out + "/trinucleotide_filtered.fa"
     noncds_alns.write(file_out)
-    #print("Processed region:", region)
+
+    with open(folder_out + "/trinucleotide_filtered_alnstat.txt", mode = "w") as out: 
+        out.write("alignment length: " + str(len(noncds_alns)))
 
 if __name__ == "__main__":
     main()

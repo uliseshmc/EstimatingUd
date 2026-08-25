@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=testing_tinuc_model
-#SBATCH --output=logs_codongaligner/codon_aligner_1_%A_%a.out
-#SBATCH --error=logs_codongaligner/codon_aligner_1_%A_%a.err
+#SBATCH --job-name=trinuc_codonaligner
+#SBATCH --output=logs_codonaligner/trinuc_codon_aligner_1_%A_%a.out
+#SBATCH --error=logs_codonaligner/trinuc_codon_aligner_1_%A_%a.err
 #SBATCH --array=1-24
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
@@ -11,7 +11,7 @@
 #SBATCH --partition=standard
 
 # Create logs directory
-mkdir -p logs_codongaligner/
+mkdir -p logs_codonaligner/
 
 # Initialize conda (using the safer shell.bash hook approach)
 eval "$(conda shell.bash hook)"

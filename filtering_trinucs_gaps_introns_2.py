@@ -12,9 +12,8 @@ def filtering_UTR5():
     loader = get_app("load_aligned", moltype="dna")
     rename_noncds = libs.renamer_noncds_aligned()
     get_UTR5 = libs.sample_UTR5()
-    omit_gap_pos_app = get_app("omit_gap_pos", moltype="dna")
     omit_degs_noncds = get_app("omit_degenerates", moltype="dna", motif_length=3)
-    UTR5_app = loader + rename_noncds + get_UTR5 + omit_gap_pos_app + omit_degs_noncds
+    UTR5_app = loader + rename_noncds + get_UTR5 + omit_degs_noncds
 
     return UTR5_app
 
@@ -22,9 +21,8 @@ def filtering_UTR3():
     loader = get_app("load_aligned", moltype="dna")
     rename_noncds = libs.renamer_noncds_aligned()
     get_UTR3 = libs.sample_UTR3()
-    omit_gap_pos_app = get_app("omit_gap_pos", moltype="dna")
     omit_degs_noncds = get_app("omit_degenerates", moltype="dna", motif_length=3)
-    UTR3_app = loader + rename_noncds + get_UTR3 + omit_gap_pos_app + omit_degs_noncds
+    UTR3_app = loader + rename_noncds + get_UTR3 + omit_degs_noncds
 
     return UTR3_app 
 
@@ -32,9 +30,8 @@ def filtering_nonUTR():
     loader = get_app("load_aligned", moltype="dna")
     rename_noncds = libs.renamer_noncds_aligned()
     remove_UTR = libs.removeUTRs_fromintrons()
-    omit_gap_pos_app = get_app("omit_gap_pos", moltype="dna")
     omit_degs_noncds = get_app("omit_degenerates", moltype="dna", motif_length=3)
-    nonUTR_app = loader + rename_noncds + remove_UTR + omit_gap_pos_app + omit_degs_noncds
+    nonUTR_app = loader + rename_noncds + remove_UTR + omit_degs_noncds
 
     return nonUTR_app
 
@@ -67,7 +64,9 @@ def main():
 
     file_out = folder_out + "/trinucleotide_filtered.fa"
     introns_alns.write(file_out)
-    #print("Processed region:", region)
+
+    with open(folder_out + "/trinucleotide_filtered_alnstat.txt", mode = "w") as out: 
+        out.write("alignment length: " + str(len(introns_alns)))
 
     ## Process UTR3
     UTR3_app = filtering_UTR3()
@@ -81,7 +80,9 @@ def main():
 
     file_out = folder_out + "/trinucleotide_filtered.fa"
     introns_alns.write(file_out)
-    #print("Processed region:", region)
+
+    with open(folder_out + "/trinucleotide_filtered_alnstat.txt", mode = "w") as out: 
+        out.write("alignment length: " + str(len(introns_alns)))
 
     ## Process non-UTR introns
     nonUTR_app = filtering_nonUTR()
@@ -95,7 +96,9 @@ def main():
 
     file_out = folder_out + "/trinucleotide_filtered.fa"
     introns_alns.write(file_out)
-    #print("Processed region:", region)
+
+    with open(folder_out + "/trinucleotide_filtered_alnstat.txt", mode = "w") as out: 
+        out.write("alignment length: " + str(len(introns_alns)))
 
 if __name__ == "__main__":
     main()

@@ -1,17 +1,17 @@
 #!/bin/bash
 #SBATCH --job-name=filtering_3
-#SBATCH --output=logs/filtering_3_%A_%a.out
-#SBATCH --error=logs/filtering_3_%A_%a.err
+#SBATCH --output=logs_filtering/filtering_3_%A_%a.out
+#SBATCH --error=logs_filtering/filtering_3_%A_%a.err
 #SBATCH --array=1-120
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --mem=100gb
+#SBATCH --mem=120gb
 #SBATCH --time=3-00:00:00
 #SBATCH --account=masel
 #SBATCH --partition=standard
 
 # Create logs directory
-mkdir -p logs/
+mkdir -p logs_filtering/
 
 # Initialize conda (using the safer shell.bash hook approach)
 eval "$(conda shell.bash hook)"

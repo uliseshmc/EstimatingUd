@@ -13,7 +13,8 @@ def filtering_cds():
     rename = libs.renamer_cds_unaligned()
     trim_stops = get_app("trim_stop_codons")
     codon_align = get_app("progressive_align", "codon", guide_tree="(Human:0.06,Chimpanzee:0.06,Orangutan:0.14)")
-    cds_app = loader + rename + trim_stops + codon_align
+    omit_degs = get_app("omit_degenerates", moltype="dna", motif_length=1)
+    cds_app = loader + rename + trim_stops + codon_align + omit_degs
 
     return cds_app
 
@@ -46,7 +47,9 @@ def main():
 
     file_out = folder_out + "/filtered.fa"
     cds_alns.write(file_out)
-    #print("Processed region:", region)
+
+    with open(folder_out + "/filtered_alnstat.txt", mode = "w") as out: 
+            out.write("alignment length: " + str(len(cds_alns)))
 
 if __name__ == "__main__":
     main()
