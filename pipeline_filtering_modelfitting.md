@@ -1,17 +1,20 @@
 # Preparation
 
 This instructions assume that pipeline_downloaddata.md is finished. 
-Instructions for installation of the conda package UdChimpHumOran can be found there.
+Instructions for installation of the conda package Ensembl0.7.6 can be found there.
 
 Make sure that the variable DATA_HUMCHIMPORANG115 in the file paths.py points at the location where you downloaded the alignments. 
+
+Start by activating the environment
+```
+conda activate Ensembl0.7.6
+```
 
 ## Filtering cds
 
 eti homologs (described in pipeline_download.md) creates a sequence collection of cds orthologous cds regions across the Chimps, Orangutans and Human. To align these sequences at the codon level we use
 
 ```
-conda activate UdChimpHumOran
-
 python3 codon_aligner_1.py -chrm $chr
 ```
 
@@ -20,8 +23,6 @@ This script will align and remove stop codons from the cds sequences. It will ou
 For trinucleotide models, trinucletide sites with any gap have to be filtered out from the alignment. This is done by the script 
 
 ```
-conda activate UdChimpHumOran
-
 python3 codon_aligner_trinucs_1.py -chrm $chr
 ```
 where $chr is the chromosome stableid (1,2,..22, X, Y)
@@ -33,8 +34,6 @@ This and all trinucleotide filtering are output in a file named trinucleotide_fi
 The alignment of Chimps, Orangutans and Human contain many gap sites corresponding to data in any of the other 7 aligned species. Also, the data is distributed accross many files that take up more than 20 TB of storage. To solve this issue, I filtered out all gaped sites and store the whole chromosome alignment into a single concatenated alignment in the file filtered.fa. This is done by.
 
 ```
-conda activate UdChimpHumOran
-
 python3 filtering_gaps_nointrons_3.py -reg <insert $region -chrm $chr
 ```
 
@@ -43,8 +42,6 @@ where available regions are "intergenicAR", "intronsAR", "distalIG", "proximal5I
 Trinucleotide filtering is achieved by
 
 ```
-conda activate UdChimpHumOran
-
 python3 filtering_trinucs_gaps_nointrons_3.py -reg $region -chrm $chr
 ```
 
@@ -54,16 +51,12 @@ python3 filtering_trinucs_gaps_nointrons_3.py -reg $region -chrm $chr
 I divided intron sequences into 5'UTR, 3'UTR and nonUTR regions. Then I filtered out gapped sites (See section above). This is done by 
 
 ```
-conda activate UdChimpHumOran
-
 python3 filtering_gaps_introns_2.py -chrm $chr
 ```
 
 For trinucleotide models, use
 
 ```
-conda activate UdChimpHumOran
-
 python3 filtering_trinucs_gaps_introns_2.py -chrm $chr
 ```
 

@@ -1,50 +1,15 @@
 # Installation
 ## Conda Environment setup
 ```
-conda create -n UdChimpHumOran python=3.13
-conda activate UdChimpHumOran
+conda create -n Ensembl0.7.6 python=3.13
+conda activate Ensembl0.7.6
 ```
 
 ## Installing cogent3 and ensembl_tui
 
-<!-- I'm not doing any of this now
-through github
-```
-mkdir -p ~/repos
-cd ~/repos
-cd ../
-git clone git@github.com:cogent3/ensembl_tui.git
-cd ensembl_tui
-pip install -e ".[dev]"
-git clone git@github.com:cogent3/cogent3.git
-cd cogent3
-pip install -e ".[dev]"
-```
-
-through flit
-```
-pip install flit
-install -s --python `which python
-```
-
-
-We start by installing ensembl tui and cogent3 packages
-```
-pip install ensembl_tui
-pip install "cogent3==2026.1.12a1" "cogent3_h5seqs==0.7.3" -U
-```
-Please check that the package versions are cogent3==2026.1.12a1, cogent3-h5seqs==0.7.3 and ensembl_tui==0.4.3 using
-```
-pip freeze
-```
-
-# Newest installation
--->
-
 We start by installing ensembl tui and cogent3 packages
 ```
 pip install "ensembl_tui==0.7.6"
-pip install "cogent3==2026.1.12a1" "cogent3_h5seqs==0.7.3" -U
 ```
 Please check that the package versions are cogent3==2026.1.12a1, cogent3-h5seqs==0.7.3 and ensembl_tui==0.7.6 using
 ```
@@ -54,14 +19,12 @@ pip freeze
 ## Installation of other libraries
 We also need this libraries
 ```
-pip install pandas
-pip install matplotlib
-pip install phylim
+pip install pandas matplotlib
 ```
 
 ## Downloading and installing the alignments
 ```
-conda activate Udestimation_env
+conda activate Ensembl0.7.6
 eti download -c HumChimpOran_10_115.cfg
 cd HumChimpOran_10_115
 eti install -d download -np <insert number>

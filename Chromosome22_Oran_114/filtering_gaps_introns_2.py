@@ -60,10 +60,12 @@ def main():
         folder_out = paths.DATA_HUMCHIMPORANG115 + region_out
         os.makedirs(folder_out, exist_ok=True)
 
-        if args.substitutionmodel == False:
+        if args.substitutionmodel == "singlent":
             label = "singlent_filtered"
-        else:
+        elif substitutionmodel == "trinuc":
             label = "trinucleotide_filtered"
+        else:
+            raise ValueError("Trying to use a substitution model other than singlent, or trinuc")
             
         file_out = folder_out + "/" + label + ".fa"
         introns_alns.write(file_out)
