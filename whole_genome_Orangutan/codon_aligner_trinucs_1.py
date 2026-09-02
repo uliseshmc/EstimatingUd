@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import cogent3
 from cogent3 import get_app
-import paths
-import libs
+import whole_genome_Orangutan.paths as paths
+import whole_genome_Orangutan.libs as libs
 import argparse
 import os
 

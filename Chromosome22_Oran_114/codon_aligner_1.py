@@ -41,17 +41,17 @@ def main():
     cds_app = filtering_cds(args.substitutionmodel)
 
     region = "cds/alldata_chrm22"
-    folder_in = paths.DATA_HUMCHIMPORANG115 + region
+    folder_in = paths.DATA_HUMCHIMPORANGOR114 + region
     in_dstore = cogent3.open_data_store(folder_in, suffix='fa', mode='r')
     
     nonconcat_cds = [r for r in cds_app.as_completed(in_dstore[:], parallel=False) if r]
     cds_alns = concat(nonconcat_cds)
 
     region_out = "cds/chrm22"
-    folder_out = paths.DATA_HUMCHIMPORANG115 + region_out
+    folder_out = paths.DATA_HUMCHIMPORANGOR114 + region_out
     os.makedirs(folder_out, exist_ok=True)
 
-    if args.substitutionmodel == False:
+    if args.substitutionmodel == "singlent":
         label = "singlent_filtered"
     else:
         label = "trinucleotide_filtered"

@@ -1,1 +1,1 @@
-DATA_HUMCHIMPORANG115 = '/xdisk/masel/uliseshmc/EstimatingUd/HumChimOran_10_115/'
+DATA_HUMCHIMPORANGOR114 = '/home/ulises/Proyectos/EstimatingUd/Data_Ensembl0.7.7/HumChimpOranGor_10_114/'

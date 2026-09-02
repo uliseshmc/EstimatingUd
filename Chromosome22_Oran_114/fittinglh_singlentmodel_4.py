@@ -3,10 +3,10 @@ import cogent3
 from cogent3 import get_app
 from cogent3 import load_aligned_seqs
 import matplotlib.pyplot as plt
-import paths
+import whole_genome_Orangutan.paths as paths
 import pickle
 import os
-import trinuc_models as trinucs # this module must be in the same directory as this notebook
+import whole_genome_Orangutan.trinuc_models as trinucs # this module must be in the same directory as this notebook
 
 SUBMODELS = ["trinuc", "singlent"]
 REGIONS = ["cds", "introns", "introns3UTR", "introns5UTR", "introns_nonUTR", "intergenicAR", "intronsAR", "distalIG", "proximal5IG", "proximal3IG"]
