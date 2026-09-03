@@ -4,7 +4,15 @@ from cogent3 import get_app
 import paths
 import libs
 import argparse
+import numpy
 import os
+
+# cogent3.maths.util sets numpy.seterr(divide="raise") at import time, while
+# cogent3.evolve.likelihood_tree sets seterr(all="ignore") -- whichever loads last
+# wins. progressive_align's pair-HMM always takes log(0) on the structurally-zero
+# BEGIN/END entries of its transition matrix (a legitimate -inf), so if "raise" is
+# in effect every alignment fails with FloatingPointError. Pin it here.
+numpy.seterr(divide="ignore")
 
 SUBMODELS = ["trinuc", "singlent"]
 

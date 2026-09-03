@@ -2,14 +2,13 @@ import argparse
 import cogent3
 from cogent3 import get_app
 from cogent3 import load_aligned_seqs
-import matplotlib.pyplot as plt
-import whole_genome_Orangutan.paths as paths
+import paths
 import pickle
 import os
-import whole_genome_Orangutan.trinuc_models as trinucs # this module must be in the same directory as this notebook
+import trinuc_models as trinucs # this module must be in the same directory as this notebook
 
 SUBMODELS = ["trinuc", "singlent"]
-REGIONS = ["cds", "introns", "introns3UTR", "introns5UTR", "introns_nonUTR", "intergenicAR", "intronsAR", "distalIG", "proximal5IG", "proximal3IG"]
+REGIONS = ["cds", "intronsAR", "introns3UTR", "introns5UTR", "introns_nonUTR", "intergenicAR", "distalIG", "proximal5IG", "proximal3IG"]
 
 def singlentmodel_cds():
     GN_subsmodel = get_app("model", "GN", time_het="max", lf_args={"discrete_edges": ["Orangutan"]}, optimise_motif_probs=False, show_progress=False)
@@ -73,9 +72,18 @@ def main():
 
     for genomic_region in REGIONS:
 
-        region = genomic_region + "/chrm" + args.chromosome
-        folder_in = paths.DATA_HUMCHIMPORANG115 + region
-        file_in = folder_in + "/filtered.fa"
+        relative_folder_in = genomic_region + "/chrm22" 
+        folder_in = paths.DATA_HUMCHIMPORANGOR114 + relative_folder_in
+
+        if args.substitutionmodel == "singlent":
+            file_in = folder_in + "/singlent_filtered.fa"
+            label_out = "/singlent"
+        elif args.substitutionmodel == "trinuc":
+            file_in = folder_in + "/trinucleotide_filtered.fa"
+            label_out = "/trinucleotide"
+        else:
+            raise ValueError("Trying to use a substitution model other than singlent, or trinuc")
+        
         alns = load_aligned_seqs(file_in, moltype="dna")
 
         if genomic_region == "cds":
@@ -85,14 +93,11 @@ def main():
 
         result_sm = sm(alns)
 
-        data_out = folder_in + "/sm_output"
-        os.makedirs(data_out, exist_ok=True)
+        folder_out = folder_in + "/sm_output"
+        os.makedirs(folder_out, exist_ok=True)
 
-        with open(data_out + "/singlent_lh.pickle", mode = "wb") as out: 
+        with open(folder_out + label_out + "_lh.pickle", mode = "wb") as out: 
             out.write(pickle.dumps(result_sm))
-
-        with open(data_out + "/singlent_alnstat.txt", mode = "w") as out: 
-            out.write("alignment length: " + str(len(alns)))
 
 if __name__ == "__main__":
     main()

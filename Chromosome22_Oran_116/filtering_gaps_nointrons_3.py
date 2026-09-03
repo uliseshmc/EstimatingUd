@@ -7,29 +7,20 @@ import argparse
 import os
 
 SUBMODELS = ["trinuc", "singlent"]
-INTRONREGIONS = ["introns3UTR", "introns5UTR", "introns_nonUTR"]
+REGIONS = ["intergenicAR"]
 
-def filtering_introns(region, substitutionmodel):
+def filtering_noncds(trinucleotide):
     loader = get_app("load_aligned", moltype="dna")
     rename_noncds = libs.renamer_noncds_aligned()
-    if region == "introns5UTR":
-        get_region = libs.sample_UTR5()
-    elif region == "introns3UTR":
-        get_region = libs.sample_UTR3()
-    elif region == "introns_nonUTR":
-        get_region = libs.removeUTRs_fromintrons()
-    else:
-        raise ValueError("Trying to filter an intron region other than introns3UTR, introns5UTR, or introns_nonUTR")
-
-    if substitutionmodel == "singlent":
+    if trinucleotide == "singlent":
         omit_degs = get_app("omit_degenerates", moltype="dna", motif_length=1)
-    elif substitutionmodel == "trinuc":
+    elif trinucleotide == "trinuc":
         omit_degs = get_app("omit_degenerates", moltype="dna", motif_length=3)
     else:
         raise ValueError("Trying to use a substitution model other than singlent, or trinuc")
+    noncds_app = loader + rename_noncds + omit_degs
 
-    introns_app = loader + rename_noncds + get_region + omit_degs
-    return introns_app
+    return noncds_app
 
 def main():
     parser = argparse.ArgumentParser()
@@ -43,35 +34,33 @@ def main():
     )
     args = parser.parse_args()
 
+    noncds_app = filtering_noncds(args.substitutionmodel)
     concat = get_app("concat", moltype="dna")
 
-    for region in INTRONREGIONS:
-        
-        introns_app = filtering_introns(region, args.substitutionmodel)
-            
-        relative_folder_in = "introns/alldata_chrm22"
-        folder_in = paths.DATA_HUMCHIMPORANGOR114 + relative_folder_in
+    for genomic_region in REGIONS:
+        relative_folder_in = genomic_region + "/alldata_chrm22"
+        folder_in = paths.DATA_HUMCHIMPORANGOR116 + relative_folder_in
         in_dstore = cogent3.open_data_store(folder_in, suffix='fa', mode='r')
         
-        nonconcat_introns = [r for r in introns_app.as_completed(in_dstore[:], parallel=False) if r]
-        introns_alns = concat(nonconcat_introns)
-    
-        relative_folder_out = region + "/chrm22"
-        folder_out = paths.DATA_HUMCHIMPORANGOR114 + relative_folder_out
-        os.makedirs(folder_out, exist_ok=True)
+        nonconcat_noncds = [r for r in noncds_app.as_completed(in_dstore[:], parallel=False) if r]
+        noncds_alns = concat(nonconcat_noncds)
 
+        relative_folder_out = genomic_region + "/chrm22"
+        folder_out = paths.DATA_HUMCHIMPORANGOR116 + relative_folder_out
+        os.makedirs(folder_out, exist_ok=True)
+        
         if args.substitutionmodel == "singlent":
             label = "singlent_filtered"
         elif args.substitutionmodel == "trinuc":
             label = "trinucleotide_filtered"
         else:
             raise ValueError("Trying to use a substitution model other than singlent, or trinuc")
-            
+        
         file_out = folder_out + "/" + label + ".fa"
-        introns_alns.write(file_out)
-
+        noncds_alns.write(file_out)
+        
         with open(folder_out + "/" + label + "_alnstat.txt", mode = "w") as out: 
-            out.write("alignment length: " + str(len(introns_alns)))
+            out.write("alignment length: " + str(len(noncds_alns)))
 
 if __name__ == "__main__":
     main()

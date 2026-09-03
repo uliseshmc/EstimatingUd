@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import cogent3
 from cogent3 import get_app
-import whole_genome_Orangutan.paths as paths
-import whole_genome_Orangutan.libs as libs
+import paths
+import libs
 import argparse
 import os
 
@@ -38,21 +38,23 @@ def main():
     concat = get_app("concat", moltype="dna")
 
     for genomic_region in REGIONS:
-        region = genomic_region + "/alldata_chrm22"
-        folder_in = paths.DATA_HUMCHIMPORANG115 + region
+        relative_folder_in = genomic_region + "/alldata_chrm22"
+        folder_in = paths.DATA_HUMCHIMPORANGOR114 + relative_folder_in
         in_dstore = cogent3.open_data_store(folder_in, suffix='fa', mode='r')
         
         nonconcat_noncds = [r for r in noncds_app.as_completed(in_dstore[:], parallel=False) if r]
         noncds_alns = concat(nonconcat_noncds)
 
-        region_out = genomic_region + "/chrm22"
-        folder_out = paths.DATA_HUMCHIMPORANG115 + region_out
+        relative_folder_out = genomic_region + "/chrm22"
+        folder_out = paths.DATA_HUMCHIMPORANGOR114 + relative_folder_out
         os.makedirs(folder_out, exist_ok=True)
         
-        if args.substitutionmodel == False:
+        if args.substitutionmodel == "singlent":
             label = "singlent_filtered"
-        else:
+        elif args.substitutionmodel == "trinuc":
             label = "trinucleotide_filtered"
+        else:
+            raise ValueError("Trying to use a substitution model other than singlent, or trinuc")
         
         file_out = folder_out + "/" + label + ".fa"
         noncds_alns.write(file_out)
