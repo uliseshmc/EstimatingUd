@@ -15,15 +15,15 @@ conda activate Ensembl0.7.6
 eti homologs (described in pipeline_download.md) creates a sequence collection of cds orthologous cds regions across the Chimps, Orangutans and Human. To align these sequences at the codon level we use
 
 ```
-python3 codon_aligner_1.py -chrm $chr
+python3 codon_aligner_1.py -chrm $chr -submodel singlent
 ```
 
-This script will align and remove stop codons from the cds sequences. It will output the conncatenetad whole chromosome alignment in the file filtered.fa. This and all other filtered files are ocated in the same folder as its corresponding chromosome datastore
+This script will align and remove stop codons from the cds sequences. It will also remove columns with degenerate characters (maksed: "?", gaps: "-", non neucleotide symbols). It will output the conncatenetad whole chromosome alignment in the file filtered.fa. This and all other filtered files are located in the same folder as its corresponding chromosome datastore
 
 For trinucleotide models, trinucletide sites with any gap have to be filtered out from the alignment. This is done by the script 
 
 ```
-python3 codon_aligner_trinucs_1.py -chrm $chr
+python3 codon_aligner_1.py -chrm $chr -submodel trinuc
 ```
 where $chr is the chromosome stableid (1,2,..22, X, Y)
 
@@ -31,18 +31,16 @@ This and all trinucleotide filtering are output in a file named trinucleotide_fi
 
 ## Filtering gapped sites (in regions other than cds and introns)
 
-The alignment of Chimps, Orangutans and Human contain many gap sites corresponding to data in any of the other 7 aligned species. Also, the data is distributed accross many files that take up more than 20 TB of storage. To solve this issue, I filtered out all gaped sites and store the whole chromosome alignment into a single concatenated alignment in the file filtered.fa. This is done by.
+For the sinle nucleotide model
 
 ```
-python3 filtering_gaps_nointrons_3.py -reg <insert $region -chrm $chr
+python3 filtering_gaps_nointrons_3.py -chrm $chr -submodel singlent
 ```
 
-where available regions are "intergenicAR", "intronsAR", "distalIG", "proximal5IG", or "proximal3IG".
-
-Trinucleotide filtering is achieved by
+For the trinucleotide models
 
 ```
-python3 filtering_trinucs_gaps_nointrons_3.py -reg $region -chrm $chr
+python3 filtering_gaps_nointrons_3.py -chrm $chr -submodel trinuc
 ```
 
 
@@ -51,14 +49,25 @@ python3 filtering_trinucs_gaps_nointrons_3.py -reg $region -chrm $chr
 I divided intron sequences into 5'UTR, 3'UTR and nonUTR regions. Then I filtered out gapped sites (See section above). This is done by 
 
 ```
-python3 filtering_gaps_introns_2.py -chrm $chr
+python3 filtering_gaps_introns_2.py -chrm $chr -submodel singlent
 ```
 
 For trinucleotide models, use
 
 ```
-python3 filtering_trinucs_gaps_introns_2.py -chrm $chr
+python3 filtering_gaps_introns_2.py -chrm $chr -submodel trinuc
 ```
+
+## Filtering human sequence
+
+Our mutation model considers genomic regions to account for mutation heterogeneity.
+To do this. we need to get the unconncatenated human sequence. This is done by
+
+```
+python3 get_human_sequence.py -chrm $chr -mutmotif 3
+```
+
+We use the Oman et al model which accounts for trinuleotide context. Thus we set mutmotif to 3
 
 ## Bash mode
 
@@ -74,17 +83,7 @@ This will output a list of all .err files into runs_with_errors.txt.
 
 # Dealing with storage limitations
 
-The eti command originally creates a file for each contig. This result in huge storage requirements when downloading the whole genome. The data is divided into two folder categories.
-
-$region/alldata_chrm$chr
-
-stores the outputs of the eti command. 
-
-$region/chrm$chr
-
-stores the filtered data resulting from codon_aligner_1.py, filtering_gaps_introns_2.py and filtering_gaps_nointrons.py (and their respective trinucleotide versions). 
-
-If running into data storage limitations, I recommend to zip all data using 
+If running into data storage limitations, I recommend running the filtering and then to zip alldata folders using 
 
 ```
 tar -cf - "$region" | pigz -p $#processors > "$region.tar.gz"

@@ -6,7 +6,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --mem=60gb
-#SBATCH --time=1-00:00:00
+#SBATCH --time=10:00:00
 #SBATCH --account=masel
 #SBATCH --partition=standard
 

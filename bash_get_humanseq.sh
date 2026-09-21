@@ -1,17 +1,17 @@
 #!/bin/bash
-#SBATCH --job-name=codon_aligner
-#SBATCH --output=logs_codonaligner/codon_aligner_1_%A_%a.out
-#SBATCH --error=logs_codonaligner/codon_aligner_1_%A_%a.err
+#SBATCH --job-name=get_humanseq
+#SBATCH --output=logs_humanseq/get_humanseq_%A_%a.out
+#SBATCH --error=logs_humanseq/get_humanseq_%A_%a.err
 #SBATCH --array=1-24
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --mem=60gb
-#SBATCH --time=4:00:00
+#SBATCH --time=10:00:00
 #SBATCH --account=masel
 #SBATCH --partition=standard
 
 # Create logs directory
-mkdir -p logs_codonaligner/
+mkdir -p logs_humanseq/
 
 # Initialize conda (using the safer shell.bash hook approach)
 eval "$(conda shell.bash hook)"
@@ -29,5 +29,4 @@ fi
 CHROMOSOME="${CHROMOSOMES[$((TASK_ID - 1))]}"
 echo "Running codon aligner for chromosome $CHROMOSOME"
 
-python3 codon_aligner_1.py -chrm "$CHROMOSOME" -submodel singlent
-python3 codon_aligner_1.py -chrm "$CHROMOSOME" -submodel trinuc
+python3 get_human_sequence.py -chrm "$CHROMOSOME" -mutmotif 3
