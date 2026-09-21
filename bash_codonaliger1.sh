@@ -5,8 +5,8 @@
 #SBATCH --array=1-24
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --mem=120gb
-#SBATCH --time=3-00:00:00
+#SBATCH --mem=60gb
+#SBATCH --time=1-00:00:00
 #SBATCH --account=masel
 #SBATCH --partition=standard
 
@@ -15,7 +15,7 @@ mkdir -p logs_codonaligner/
 
 # Initialize conda (using the safer shell.bash hook approach)
 eval "$(conda shell.bash hook)"
-conda activate UdChimpHumOran
+conda activate Ensembl0.7.9
 
 CHROMOSOMES=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21" "22" "X" "Y")
 

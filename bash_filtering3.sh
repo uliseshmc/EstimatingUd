@@ -2,11 +2,11 @@
 #SBATCH --job-name=filtering_3
 #SBATCH --output=logs_filtering/filtering_3_%A_%a.out
 #SBATCH --error=logs_filtering/filtering_3_%A_%a.err
-#SBATCH --array=1-120
+#SBATCH --array=1-24
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --mem=120gb
-#SBATCH --time=3-00:00:00
+#SBATCH --mem=60gb
+#SBATCH --time=4:00:00
 #SBATCH --account=masel
 #SBATCH --partition=standard
 
@@ -15,25 +15,20 @@ mkdir -p logs_filtering/
 
 # Initialize conda (using the safer shell.bash hook approach)
 eval "$(conda shell.bash hook)"
-conda activate UdChimpHumOran
+conda activate Ensembl0.7.9
 
-REGIONS=("intergenicAR" "intronsAR" "distalIG" "proximal5IG" "proximal3IG")
 CHROMOSOMES=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21" "22" "X" "Y")
 
 TASK_ID="${SLURM_ARRAY_TASK_ID:-1}"
-TOTAL_COMBINATIONS=$(( ${#REGIONS[@]} * ${#CHROMOSOMES[@]} ))
 
-if (( TASK_ID < 1 || TASK_ID > TOTAL_COMBINATIONS )); then
+if (( TASK_ID < 1 || TASK_ID > ${#CHROMOSOMES[@]} )); then
     echo "Invalid SLURM_ARRAY_TASK_ID: $TASK_ID" >&2
     exit 1
 fi
 
-REGION_INDEX=$(((TASK_ID - 1) / ${#CHROMOSOMES[@]}))
-CHROMOSOME_INDEX=$(((TASK_ID - 1) % ${#CHROMOSOMES[@]}))
-REGION="${REGIONS[$REGION_INDEX]}"
-CHROMOSOME="${CHROMOSOMES[$CHROMOSOME_INDEX]}"
+CHROMOSOME="${CHROMOSOMES[$((TASK_ID - 1))]}"
 
 echo "Running filtering for region=$REGION chromosome=$CHROMOSOME"
 
-python3 filtering_gaps_nointrons_3.py -reg "$REGION" -chrm "$CHROMOSOME" -submodel singlent
-python3 filtering_gaps_nointrons_3.py -reg "$REGION" -chrm "$CHROMOSOME" -submodel trinuc
+python3 filtering_gaps_nointrons_3.py -chrm "$CHROMOSOME" -submodel singlent
+python3 filtering_gaps_nointrons_3.py -chrm "$CHROMOSOME" -submodel trinuc

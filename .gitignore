@@ -2,7 +2,7 @@
 *.pickle
 *.csv
 
-#bash run folder
+#SLURM exit files
 logs/
 logs*
 
