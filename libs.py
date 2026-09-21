@@ -1,0 +1,238 @@
+import cogent3
+# needed: binds the cogent3.app.composable submodule used by the decorators below
+from scinexus.composable import define_app
+
+from cogent3.app.typing import AlignedSeqsType
+from cogent3.app.typing import UnalignedSeqsType
+from cogent3.app.typing import SeqType
+
+from itertools import permutations
+import cogent3 as c3
+from cogent3.evolve.predicate import MotifChange
+from cogent3.evolve.ns_substitution_model import NonReversibleDinucleotide, NonReversibleCodon
+
+import collections
+from collections import Counter
+
+import numpy as np
+
+# I'm using this app to rename sequences in a dataset
+# Some alignment files include duplicates (paralogs). This function will throw an error and not raneme the sequences if it happens
+
+@define_app
+def renamer_cds_unaligned(seqs: UnalignedSeqsType) -> UnalignedSeqsType:
+    """
+    A function to rename sequences in a dataset.
+    """
+    name_map = {
+        "homo_sapiens": "Human",
+        "pan_troglodytes": "Chimpanzee",
+        "pongo_abelii": "Orangutan"
+    }
+
+    seqs = seqs.renamed_seqs(lambda x: name_map.get(x.split("-")[0], x))
+
+    return seqs.take_seqs(list(name_map.values()))
+
+@define_app
+def renamer_cds_aligned(seqs: AlignedSeqsType) -> AlignedSeqsType:
+    """
+    A function to rename sequences in a dataset.
+    """
+    name_map = {
+        "homo_sapiens": "Human",
+        "pan_troglodytes": "Chimpanzee",
+        "pongo_abelii": "Orangutan"
+    }
+
+    seqs = seqs.renamed_seqs(lambda x: name_map.get(x.split("-")[0], x))
+
+    return seqs.take_seqs(list(name_map.values()))
+
+@define_app
+def renamer_noncds_unaligned(seqs: UnalignedSeqsType) -> UnalignedSeqsType:
+    """
+    A function to rename sequences in a dataset.
+    """
+    name_map = {
+        "homo_sapiens": "Human",
+        "pan_troglodytes": "Chimpanzee",
+        "pongo_abelii": "Orangutan"
+    }
+
+    seqs = seqs.renamed_seqs(lambda x: name_map.get(x.split(":")[0], x))
+
+    return seqs.take_seqs(list(name_map.values()))
+
+@define_app
+def renamer_noncds_aligned(seqs: AlignedSeqsType) -> AlignedSeqsType:
+    """
+    A function to rename sequences in a dataset.
+    """
+    name_map = {
+        "homo_sapiens": "Human",
+        "pan_troglodytes": "Chimpanzee",
+        "pongo_abelii": "Orangutan"
+    }
+
+    seqs = seqs.renamed_seqs(lambda x: name_map.get(x.split(":")[0], x))
+
+    return seqs.take_seqs(list(name_map.values()))
+
+@define_app
+def gethumanseq_cds_unaligned(seqs: UnalignedSeqsType, motif_length: int = 1) -> SeqType:
+    """
+    A function to get human sequence for a cds unaligned sequences collection.
+    """
+    name_map = {
+        "homo_sapiens": "Human"
+    }
+
+    seqs = seqs.renamed_seqs(lambda x: name_map.get(x.split("-")[0], x))
+    humanaln = seqs.take_seqs(list(name_map.values()))
+    humanseq = humanaln.seqs["Human"]
+    
+    multiplier = int(np.floor(len(humanseq) / motif_length))
+    # Keep only complete motifs of length n by dropping the last n-1 bases
+    humanseq = humanseq[: motif_length * multiplier]
+
+    return humanseq
+
+@define_app
+def gethumanseq_noncds_aligned(seqs: AlignedSeqsType, motif_length: int = 1) -> SeqType:
+    """
+    A function to get human sequence for noncds aligned sequences collection.
+    """
+    name_map = {
+        "homo_sapiens": "Human"
+    }
+
+    seqs = seqs.renamed_seqs(lambda x: name_map.get(x.split(":")[0], x))
+    humanaln = seqs.take_seqs(list(name_map.values()))
+    humanseq = humanaln.seqs["Human"]
+    humanseq = humanseq.seq
+
+    multiplier = int(np.floor(len(humanseq) / motif_length))
+    # Keep only complete motifs of length motif_length by dropping the trailing bases
+    humanseq = humanseq[: motif_length * multiplier]
+
+    return humanseq
+
+#Alignments that use the next 3 apps need to be renamed using the apps above
+#These apps sample UTR 5', or UTR 3' regions from intron alignments.
+#UTR 5' is everything from the start of the transcript to the first exon (masked on these alignments with '?')
+#UTR 3' is everything from the end of the last exon to the end of the transcript
+@define_app
+def sample_UTR5(aln: AlignedSeqsType) -> AlignedSeqsType:
+    seq = aln.get_gapped_seq("Human")
+
+    try:
+        pos5 = str(seq).index("?")
+    except ValueError:
+        pos5 = None
+
+    UTR5_aln = aln[0:pos5]
+
+    return UTR5_aln
+    
+@define_app
+def sample_UTR3(aln: AlignedSeqsType) -> AlignedSeqsType:
+    seq = aln.get_gapped_seq("Human")
+
+    try:
+        pos3 = str(seq).rindex("?")
+    except ValueError:
+        pos3 = None
+
+    UTR3_aln = aln[pos3+1:]
+
+    return UTR3_aln
+
+#Here I sample introns removing UTRs
+@define_app
+def removeUTRs_fromintrons(aln: AlignedSeqsType) -> AlignedSeqsType:
+    seq = aln.get_gapped_seq("Human")
+
+    try:
+        pos5 = str(seq).index("?")
+    except ValueError:
+        pos5 = None
+
+    try:
+        pos3 = str(seq).rindex("?")
+    except ValueError:
+        pos3 = None
+
+    intron_noUTR = aln[pos5:pos3]
+
+    return intron_noUTR
+
+#Estimate the number of nondegenetare human sites on a sequence
+#Use this app after renaming the human sequences to "Human"
+#We recommend to use this after filtering out degenerate positions 
+@define_app
+def human_seq_length(aln: AlignedSeqsType) -> int:
+    seq = str(aln.get_gapped_seq("Human"))
+
+    seq_length = len(str(seq))
+
+    return seq_length
+
+#Count the number of motifs on a sequence 
+@define_app
+def number_of_motifs(aln: AlignedSeqsType) -> collections.Counter:
+    seq = str(aln.get_gapped_seq("Human"))
+
+    triplet_counts = Counter(
+        seq[i:i+3] for i in range(len(seq) - 2)
+    )
+
+    return triplet_counts
+
+#Next functions define a dinucleotide substitution model. This model is useful for CpG evolution sites. 
+#The way to call the model is by using 
+# subsmodel = c3.get_app("model", GDN_CpG_ss(), time_het="max", show_progress=True, optimise_motif_probs=True)
+def make_gn_preds():
+    # making the model parameters (predictates) for
+    # the General Nucleotide Markov model
+    return [
+        MotifChange(f, t, forward_only=True)
+        for f, t in permutations("ACTG", 2)
+        if f != "T" or t != "G"
+    ]
+
+def make_nr_cpg_preds_strand_asymetric():
+    # strand specific CpG deamination rates, so separate
+    # parameters for plus strand (CG->TG) and minus
+    # strand (CG->CA)
+    return [
+        MotifChange("CG", "TG", forward_only=True),
+        MotifChange("CG", "CA", forward_only=True),
+    ]
+
+def make_nr_cpg_preds_strand_symetric():
+    # same CpG deamination rate on both strands
+    # so one parameter
+    return [
+        # | is the binary or operator that combines the predicates
+        # so we have the union of the two changes as a single parameter
+        MotifChange("CG", "TG", forward_only=True) |
+        MotifChange("CG", "CA", forward_only=True)
+    ]
+
+def _make_model(cls, **kwargs):
+    return cls(**kwargs)
+
+def GDN_CpG_ss(**kwargs):
+    """return a dinucleotide model with strand symmetric CpG deamination"""
+    ssym_preds = make_gn_preds() + make_nr_cpg_preds_strand_symetric()
+    kwargs=dict(predicates=ssym_preds, optimise_motif_probs=True, name="GDN_CpG_ss")
+    return _make_model(NonReversibleDinucleotide, **kwargs)
+
+def GDN_CpG(**kwargs):
+    """return a dinucleotide model with strand asymmetric CpG deamination"""
+    asym_preds = make_gn_preds() + make_nr_cpg_preds_strand_asymetric()
+    kwargs=dict(predicates=asym_preds, optimise_motif_probs=True, name="GDN_CpG")
+    return _make_model(NonReversibleDinucleotide, **kwargs)
+
+
