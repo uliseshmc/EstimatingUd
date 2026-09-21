@@ -1,15 +1,15 @@
 # Installation
 ## Conda Environment setup
 ```
-conda create -n Ensembl0.7.7 python=3.13
-conda activate Ensembl0.7.7
+conda create -n Ensembl0.7.9 python=3.14.7
+conda activate Ensembl0.7.9
 ```
 
 ## Installing cogent3 and ensembl_tui
 
 We start by installing ensembl tui and cogent3 packages
 ```
-pip install "ensembl_tui==0.7.7"
+pip install "ensembl_tui==0.7.9"
 ```
 Please check that the package versions are cogent3==2026.7.30a0, cogent3-h5seqs==0.7.3 using
 ```
@@ -19,12 +19,12 @@ pip freeze
 ## Installation of other libraries
 We also need this libraries
 ```
-pip install pandas matplotlib
+pip install pandas matplotlib seaborn
 ```
 
 ## Downloading and installing the alignments
 ```
-conda activate Ensembl0.7.7
+conda activate Ensembl0.7.9
 eti download -c HumChimpOran_10_114.cfg
 cd HumChimpOran_10_114
 eti install -d download -np <insert number>
@@ -68,11 +68,11 @@ eti alignments -i install -od introns/alldata_chrm$chr --align_name 10_primates*
 
 ## Intronic ancestral repeats
 
-We again use the eti alignments command  but this time we mask everything but ancestral repeats. We focous on LTRs, Type I Transposons/LINE, Type I Transposons/SINE and Type II Transposons. We write these categories on the file ancestralrepeats_1column.txt one per line.
+We again use the eti alignments command  but this time we mask everything but ancestral repeats. We focous on LTRs, Type I Transposons/LINE, Type I Transposons/SINE and Type II Transposons. We write these categories on the file focalAR_1column.txt one per line.
 Then we use the command
 
 ```
-eti alignments -i install -od intronsAR/alldata_chrm$chr --align_name 10_primates* --ref human --mask_shadow ancestralrepeats_1column.txt --coord_names $chr 
+eti alignments -i install -od intronsAR/alldata_chrm$chr --align_name 10_primates* --ref human --mask_shadow focalAR_1column.txt --coord_names $chr 
 ```
 
 
@@ -88,10 +88,10 @@ eti dump-genes -i install --species human -od .
 
 The file homo_sapiens-114-gene_metadata.tsv contains the coordinates for genes. We take their shadow to compute the intergenic regions using "location_inter_intragenic.ipynb". This notebook outputs intergenic coordinates by chromosome on the folder intergenic_coordinates/ under the names "chrom#_proximal3IG_coordinates.tsv", "chrom#_proximal5IG_coordinates.tsv" and "chrom#_distalIG_coordinates.tsv" where # is the seqid.
 
-We use again the ancestralrepeats_1column.txt file to mask shadow ancestral repeats.
+We use again the focalAR_1column.txt file to mask shadow ancestral repeats.
 
 ```
-eti alignments -i install -od intergenicAR/alldata_chrm${chr} --align_name 10_primates* --ref human --mask_shadow ancestralrepeats_1column.txt --ref_coords intergenic_coordinates/chrom${chr}_intergenic.tsv
+eti alignments -i install -od intergenicAR/alldata_chrm${chr} --align_name 10_primates* --ref human --mask_shadow focalAR_1column.txt --ref_coords intergenic_coordinates/chrom${chr}_intergenic.tsv
 ```
 
 
@@ -146,7 +146,7 @@ My testing coordinates are 22:15915800-16141765
 
 Then run
 ```
-eti alignments -i install -od selected-subset21 --ref human --ref_coords chrom22-selected.tsv --mask_shadow ancestralrepeats_1column.txt --align_name 10_primates*
+eti alignments -i install -od selected-subset21 --ref human --ref_coords chrom22-selected.tsv --mask_shadow focalAR_1column.txt --align_name 10_primates*
 ```
 
 to generate the alignment

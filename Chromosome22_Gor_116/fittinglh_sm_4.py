@@ -11,11 +11,11 @@ SUBMODELS = ["trinuc", "singlent"]
 REGIONS = ["cds", "intergenicAR"]
 
 def singlentmodel_cds():
-    GN_subsmodel = get_app("model", "GN", time_het="max", lf_args={"discrete_edges": ["Orangutan"]}, optimise_motif_probs=False, show_progress=False)
+    GN_subsmodel = get_app("model", "GN", time_het="max", lf_args={"discrete_edges": ["Gorilla"]}, optimise_motif_probs=False, show_progress=True)
     return GN_subsmodel
 
 def singlentmodel_noncds():
-    GN_subsmodel = get_app("model", "GN", time_het="max", lf_args={"discrete_edges": ["Orangutan"]}, optimise_motif_probs=False, show_progress=False)
+    GN_subsmodel = get_app("model", "GN", time_het="max", lf_args={"discrete_edges": ["Gorilla"]}, optimise_motif_probs=False, show_progress=True)
     return GN_subsmodel
 
 def trinucmodel_cds():
@@ -73,7 +73,7 @@ def main():
     for genomic_region in REGIONS:
 
         relative_folder_in = genomic_region + "/chrm22" 
-        folder_in = paths.DATA_HUMCHIMPORANGOR116 + relative_folder_in
+        folder_in = paths.DATA_HUMCHIMPGOR116 + relative_folder_in
 
         if args.substitutionmodel == "singlent":
             file_in = folder_in + "/singlent_filtered.fa"

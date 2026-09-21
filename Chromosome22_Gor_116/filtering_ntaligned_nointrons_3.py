@@ -10,15 +10,16 @@ SUBMODELS = ["trinuc", "singlent"]
 REGIONS = ["intergenicAR"]
 
 def filtering_noncds(trinucleotide):
-    loader = get_app("load_aligned", moltype="dna")
-    rename_noncds = libs.renamer_noncds_aligned()
+    loader = get_app("load_unaligned", moltype="dna")
+    rename_noncds = libs.renamer_noncds_unaligned()
+    nt_align = get_app("progressive_align", "nucleotide", guide_tree="(Human:0.06,Chimpanzee:0.06,Gorilla:0.1)")
     if trinucleotide == "singlent":
         omit_degs = get_app("omit_degenerates", moltype="dna", motif_length=1)
     elif trinucleotide == "trinuc":
         omit_degs = get_app("omit_degenerates", moltype="dna", motif_length=3)
     else:
         raise ValueError("Trying to use a substitution model other than singlent, or trinuc")
-    noncds_app = loader + rename_noncds + omit_degs
+    noncds_app = loader + rename_noncds + nt_align + omit_degs
 
     return noncds_app
 
@@ -39,14 +40,14 @@ def main():
 
     for genomic_region in REGIONS:
         relative_folder_in = genomic_region + "/alldata_chrm22"
-        folder_in = paths.DATA_HUMCHIMPORANGOR116 + relative_folder_in
+        folder_in = paths.DATA_HUMCHIMPGOR116 + relative_folder_in
         in_dstore = cogent3.open_data_store(folder_in, suffix='fa', mode='r')
         
         nonconcat_noncds = [r for r in noncds_app.as_completed(in_dstore[:], parallel=False) if r]
         noncds_alns = concat(nonconcat_noncds)
 
         relative_folder_out = genomic_region + "/chrm22"
-        folder_out = paths.DATA_HUMCHIMPORANGOR116 + relative_folder_out
+        folder_out = paths.DATA_HUMCHIMPGOR116 + relative_folder_out
         os.makedirs(folder_out, exist_ok=True)
         
         if args.substitutionmodel == "singlent":

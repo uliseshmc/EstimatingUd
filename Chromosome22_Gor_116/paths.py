@@ -1,0 +1,1 @@
+DATA_HUMCHIMPGOR116 = '/home/ulises/Proyectos/EstimatingUd/Data_Ensembl0.7.7/HumChimpGor_10_116/'

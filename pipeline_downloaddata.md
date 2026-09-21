@@ -1,17 +1,17 @@
 # Installation
 ## Conda Environment setup
 ```
-conda create -n Ensembl0.7.6 python=3.13
-conda activate Ensembl0.7.6
+conda create -n Ensembl0.7.9 python=3.12.14
+conda activate Ensembl0.7.9
 ```
 
 ## Installing cogent3 and ensembl_tui
 
 We start by installing ensembl tui and cogent3 packages
 ```
-pip install "ensembl_tui==0.7.6"
+pip install "ensembl_tui==0.7.9"
 ```
-Please check that the package versions are cogent3==2026.1.12a1, cogent3-h5seqs==0.7.3 and ensembl_tui==0.7.6 using
+Please check that the package versions are cogent3==2026.9.10, cogent3-h5seqs==0.7.3 using
 ```
 pip freeze
 ```
@@ -19,14 +19,14 @@ pip freeze
 ## Installation of other libraries
 We also need this libraries
 ```
-pip install pandas matplotlib
+pip install pandas matplotlib seaborn
 ```
 
 ## Downloading and installing the alignments
 ```
-conda activate Ensembl0.7.6
+conda activate Ensembl0.7.9
 eti download -c HumChimpOran_10_115.cfg
-cd HumChimpOran_10_115
+cd HumChimpOran_10_114
 eti install -d download -np <insert number>
 ```
 -np is number of processors
@@ -72,7 +72,7 @@ We again use the eti alignments command  but this time we mask everything but an
 Then we use the command
 
 ```
-eti alignments -i install -od intronsAR/alldata_chrm$chr --align_name 10_primates* --ref human --mask_shadow ancestralrepeats_1column.txt --coord_names $chr 
+eti alignments -i install -od intronsAR/alldata_chrm$chr --align_name 10_primates* --ref human --mask_shadow focalAR_1column.txt --coord_names $chr 
 ```
 
 
@@ -91,7 +91,7 @@ The file homo_sapiens-114-gene_metadata.tsv contains the coordinates for genes. 
 We use again the ancestralrepeats_1column.txt file to mask shadow ancestral repeats.
 
 ```
-eti alignments -i install -od intergenicAR/alldata_chrm${chr} --align_name 10_primates* --ref human --mask_shadow ancestralrepeats_1column.txt --ref_coords intergenic_coordinates/chrom${chr}_intergenic.tsv
+eti alignments -i install -od intergenicAR/alldata_chrm${chr} --align_name 10_primates* --ref human --mask_shadow focalAR_1column.txt --ref_coords intergenic_coordinates/chrom${chr}_intergenic.tsv
 ```
 
 

@@ -1,9 +1,10 @@
 import cogent3
 # needed: binds the cogent3.app.composable submodule used by the decorators below
-from cogent3.app.composable import define_app  # noqa: F401
+from scinexus.composable import define_app
 
 from cogent3.app.typing import AlignedSeqsType
 from cogent3.app.typing import UnalignedSeqsType
+from cogent3.app.typing import SeqType
 
 from itertools import permutations
 import cogent3 as c3
@@ -13,10 +14,12 @@ from cogent3.evolve.ns_substitution_model import NonReversibleDinucleotide, NonR
 import collections
 from collections import Counter
 
+import numpy as np
+
 # I'm using this app to rename sequences in a dataset
 # Some alignment files include duplicates (paralogs). This function will throw an error and not raneme the sequences if it happens
 
-@cogent3.app.composable.define_app
+@define_app
 def renamer_cds_unaligned(seqs: UnalignedSeqsType) -> UnalignedSeqsType:
     """
     A function to rename sequences in a dataset.
@@ -31,7 +34,7 @@ def renamer_cds_unaligned(seqs: UnalignedSeqsType) -> UnalignedSeqsType:
 
     return seqs.take_seqs(list(name_map.values()))
 
-@cogent3.app.composable.define_app
+@define_app
 def renamer_cds_aligned(seqs: AlignedSeqsType) -> AlignedSeqsType:
     """
     A function to rename sequences in a dataset.
@@ -46,7 +49,7 @@ def renamer_cds_aligned(seqs: AlignedSeqsType) -> AlignedSeqsType:
 
     return seqs.take_seqs(list(name_map.values()))
 
-@cogent3.app.composable.define_app
+@define_app
 def renamer_noncds_unaligned(seqs: UnalignedSeqsType) -> UnalignedSeqsType:
     """
     A function to rename sequences in a dataset.
@@ -61,7 +64,7 @@ def renamer_noncds_unaligned(seqs: UnalignedSeqsType) -> UnalignedSeqsType:
 
     return seqs.take_seqs(list(name_map.values()))
 
-@cogent3.app.composable.define_app
+@define_app
 def renamer_noncds_aligned(seqs: AlignedSeqsType) -> AlignedSeqsType:
     """
     A function to rename sequences in a dataset.
@@ -76,11 +79,50 @@ def renamer_noncds_aligned(seqs: AlignedSeqsType) -> AlignedSeqsType:
 
     return seqs.take_seqs(list(name_map.values()))
 
+@define_app
+def gethumanseq_cds_unaligned(seqs: UnalignedSeqsType, motif_length: int = 1) -> SeqType:
+    """
+    A function to get human sequence for a cds unaligned sequences collection.
+    """
+    name_map = {
+        "homo_sapiens": "Human"
+    }
+
+    seqs = seqs.renamed_seqs(lambda x: name_map.get(x.split("-")[0], x))
+    humanaln = seqs.take_seqs(list(name_map.values()))
+    humanseq = humanaln.seqs["Human"]
+    
+    multiplier = int(np.floor(len(humanseq) / motif_length))
+    # Keep only complete motifs of length n by dropping the last n-1 bases
+    humanseq = humanseq[: motif_length * multiplier]
+
+    return humanseq
+
+@define_app
+def gethumanseq_noncds_aligned(seqs: AlignedSeqsType, motif_length: int = 1) -> SeqType:
+    """
+    A function to get human sequence for noncds aligned sequences collection.
+    """
+    name_map = {
+        "homo_sapiens": "Human"
+    }
+
+    seqs = seqs.renamed_seqs(lambda x: name_map.get(x.split(":")[0], x))
+    humanaln = seqs.take_seqs(list(name_map.values()))
+    humanseq = humanaln.seqs["Human"]
+    humanseq = humanseq.seq
+
+    multiplier = int(np.floor(len(humanseq) / motif_length))
+    # Keep only complete motifs of length motif_length by dropping the trailing bases
+    humanseq = humanseq[: motif_length * multiplier]
+
+    return humanseq
+
 #Alignments that use the next 3 apps need to be renamed using the apps above
 #These apps sample UTR 5', or UTR 3' regions from intron alignments.
 #UTR 5' is everything from the start of the transcript to the first exon (masked on these alignments with '?')
 #UTR 3' is everything from the end of the last exon to the end of the transcript
-@cogent3.app.composable.define_app
+@define_app
 def sample_UTR5(aln: AlignedSeqsType) -> AlignedSeqsType:
     seq = aln.get_gapped_seq("Human")
 
@@ -93,7 +135,7 @@ def sample_UTR5(aln: AlignedSeqsType) -> AlignedSeqsType:
 
     return UTR5_aln
     
-@cogent3.app.composable.define_app
+@define_app
 def sample_UTR3(aln: AlignedSeqsType) -> AlignedSeqsType:
     seq = aln.get_gapped_seq("Human")
 
@@ -107,7 +149,7 @@ def sample_UTR3(aln: AlignedSeqsType) -> AlignedSeqsType:
     return UTR3_aln
 
 #Here I sample introns removing UTRs
-@cogent3.app.composable.define_app
+@define_app
 def removeUTRs_fromintrons(aln: AlignedSeqsType) -> AlignedSeqsType:
     seq = aln.get_gapped_seq("Human")
 
@@ -128,7 +170,7 @@ def removeUTRs_fromintrons(aln: AlignedSeqsType) -> AlignedSeqsType:
 #Estimate the number of nondegenetare human sites on a sequence
 #Use this app after renaming the human sequences to "Human"
 #We recommend to use this after filtering out degenerate positions 
-@cogent3.app.composable.define_app
+@define_app
 def human_seq_length(aln: AlignedSeqsType) -> int:
     seq = str(aln.get_gapped_seq("Human"))
 
@@ -137,7 +179,7 @@ def human_seq_length(aln: AlignedSeqsType) -> int:
     return seq_length
 
 #Count the number of motifs on a sequence 
-@cogent3.app.composable.define_app
+@define_app
 def number_of_motifs(aln: AlignedSeqsType) -> collections.Counter:
     seq = str(aln.get_gapped_seq("Human"))
 

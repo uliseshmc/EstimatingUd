@@ -20,7 +20,7 @@ def filtering_cds(substitutionmodel):
     loader = get_app("load_unaligned", moltype="dna")
     rename = libs.renamer_cds_unaligned()
     trim_stops = get_app("trim_stop_codons")
-    codon_align = get_app("progressive_align", "codon", guide_tree="(Human:0.06,Chimpanzee:0.06,Orangutan:0.14)")
+    codon_align = get_app("progressive_align", "codon", guide_tree="(Human:0.06,Chimpanzee:0.06,Gorilla:0.1)")
     if substitutionmodel == "singlent":
         omit_degs = get_app("omit_degenerates", moltype="dna", motif_length=1)
     elif substitutionmodel == "trinuc":
@@ -49,14 +49,14 @@ def main():
     cds_app = filtering_cds(args.substitutionmodel)
 
     region = "cds/alldata_chrm22"
-    folder_in = paths.DATA_HUMCHIMPORANGOR116 + region
+    folder_in = paths.DATA_HUMCHIMPGOR116 + region
     in_dstore = cogent3.open_data_store(folder_in, suffix='fa', mode='r')
     
     nonconcat_cds = [r for r in cds_app.as_completed(in_dstore[:], parallel=False) if r]
     cds_alns = concat(nonconcat_cds)
 
     region_out = "cds/chrm22"
-    folder_out = paths.DATA_HUMCHIMPORANGOR116 + region_out
+    folder_out = paths.DATA_HUMCHIMPGOR116 + region_out
     os.makedirs(folder_out, exist_ok=True)
 
     if args.substitutionmodel == "singlent":

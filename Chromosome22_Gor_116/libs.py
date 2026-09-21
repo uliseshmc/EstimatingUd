@@ -24,7 +24,7 @@ def renamer_cds_unaligned(seqs: UnalignedSeqsType) -> UnalignedSeqsType:
     name_map = {
         "homo_sapiens": "Human",
         "pan_troglodytes": "Chimpanzee",
-        "pongo_abelii": "Orangutan"
+        "gorilla_gorilla": "Gorilla"
     }
 
     seqs = seqs.renamed_seqs(lambda x: name_map.get(x.split("-")[0], x))
@@ -39,7 +39,7 @@ def renamer_cds_aligned(seqs: AlignedSeqsType) -> AlignedSeqsType:
     name_map = {
         "homo_sapiens": "Human",
         "pan_troglodytes": "Chimpanzee",
-        "pongo_abelii": "Orangutan"
+        "gorilla_gorilla": "Gorilla"
     }
 
     seqs = seqs.renamed_seqs(lambda x: name_map.get(x.split("-")[0], x))
@@ -54,7 +54,7 @@ def renamer_noncds_unaligned(seqs: UnalignedSeqsType) -> UnalignedSeqsType:
     name_map = {
         "homo_sapiens": "Human",
         "pan_troglodytes": "Chimpanzee",
-        "pongo_abelii": "Orangutan"
+        "gorilla_gorilla": "Gorilla"
     }
 
     seqs = seqs.renamed_seqs(lambda x: name_map.get(x.split(":")[0], x))
@@ -69,7 +69,7 @@ def renamer_noncds_aligned(seqs: AlignedSeqsType) -> AlignedSeqsType:
     name_map = {
         "homo_sapiens": "Human",
         "pan_troglodytes": "Chimpanzee",
-        "pongo_abelii": "Orangutan"
+        "gorilla_gorilla": "Gorilla"
     }
 
     seqs = seqs.renamed_seqs(lambda x: name_map.get(x.split(":")[0], x))

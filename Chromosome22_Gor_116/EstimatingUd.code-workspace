@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../../../miniconda3/envs/Ensembl0.7.7/lib/python3.13/site-packages/cogent3"
+		},
+		{
+			"path": "../../../../miniconda3/envs/Ensembl0.7.7/lib/python3.13/site-packages/cogent3_h5seqs"
+		},
+		{
+			"path": "../../../../miniconda3/envs/Ensembl0.7.7/lib/python3.13/site-packages/ensembl_tui"
+		}
+	],
+	"settings": {}
+}
