@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH --job-name=singlent_submodel_4
-#SBATCH --output=logs_submodel/singlent_submodel_4_%A_%a.out
-#SBATCH --error=logs_submodel/singlent_submodel_4_%A_%a.err
-#SBATCH --array=1-216
+#SBATCH --job-name=submodel_4
+#SBATCH --output=logs_submodel/submodel_4_%A_%a.out
+#SBATCH --error=logs_submodel/submodel_4_%A_%a.err
+#SBATCH --array=1-24
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --mem=200gb
-#SBATCH --time=2-00:00:00
+#SBATCH --mem=100gb
+#SBATCH --time=24:00:00
 #SBATCH --account=masel
 #SBATCH --partition=standard
 
