@@ -30,5 +30,5 @@ CHROMOSOME="${CHROMOSOMES[$((TASK_ID - 1))]}"
 
 echo "Running substitution model for region=$REGION chromosome=$CHROMOSOME"
 
-python3 fittinglh_singlentmodel_4.py -chrm "$CHROMOSOME" -submodel singlent
-python3 fittinglh_singlentmodel_4.py -chrm "$CHROMOSOME" -submodel trinuc
+python3 fittinglh_sm_4.py -chrm "$CHROMOSOME" -submodel singlent
+python3 fittinglh_sm_4.py -chrm "$CHROMOSOME" -submodel trinuc
