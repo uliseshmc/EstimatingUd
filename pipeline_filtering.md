@@ -1,13 +1,13 @@
 # Preparation
 
 This instructions assume that pipeline_downloaddata.md is finished. 
-Instructions for installation of the conda package Ensembl0.7.6 can be found there.
+Instructions for installation of the conda package Ensembl0.7.9 can be found there.
 
 Make sure that the variable DATA_HUMCHIMPORANG115 in the file paths.py points at the location where you downloaded the alignments. 
 
 Start by activating the environment
 ```
-conda activate Ensembl0.7.6
+conda activate Ensembl0.7.9
 ```
 
 ## Filtering cds
@@ -58,9 +58,9 @@ For trinucleotide models, use
 python3 filtering_gaps_introns_2.py -chrm $chr -submodel trinuc
 ```
 
-## Filtering human sequence
+## Taking only human sequence
 
-Our mutation model considers genomic regions to account for mutation heterogeneity.
+Our mutation model (see mutation_rate_perregion.ipynb) considers genomic regions to account for mutation heterogeneity.
 To do this. we need to get the unconncatenated human sequence. This is done by
 
 ```
