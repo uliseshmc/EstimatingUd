@@ -9,7 +9,7 @@ import numpy as np
 import trinuc_models as trinucs # this module must be in the same directory as this notebook
 
 SUBMODELS = ["trinuc", "singlent"]
-REGIONS = ["cds", "introns_nonUTR", "introns3UTR", "introns5UTR", "introns_nonUTR", "intronsAR", "distalIG", "proximal5IG", "proximal3IG"]
+REGIONS = ["cds", "introns_nonUTR", "introns3UTR", "introns5UTR", "intronsAR", "distalIG", "proximal5IG", "proximal3IG"]
 CHROMOSOMES = [str(i) for i in range(1, 23)] + ["X"]
 
 def parse_alignment_length(s: str, fmt: str = "{:.6e}") -> str:
@@ -39,9 +39,9 @@ def get_aln_length(region, chrm, submodel):
     folder_in = paths.DATA_HUMCHIMPORANGOR114 + region_path
 
     if submodel == "singlent":
-        file_in = folder_in + "/trinucleotide_filtered_alnstat.txt"
-    elif submodel == "trinuc":
         file_in = folder_in + "/singlent_filtered_alnstat.txt"
+    elif submodel == "trinuc":
+        file_in = folder_in + "/trinucleotide_filtered_alnstat.txt"
     else:
         raise ValueError("Trying to use a substitution model other than singlent, or trinuc")
     
@@ -101,10 +101,9 @@ def main():
     # including stop codons
     alphabet_trinucs = get_trinuc_alphabet()
 
-    row_data_ENS = []
-    row_data_constraint = []
-
     for submodel in SUBMODELS:
+        row_data_ENS = []
+        row_data_constraint = []
         for chromosome in CHROMOSOMES:
             file_in = get_model_path("intergenicAR", chromosome, submodel)
             with open(file_in, mode = "rb") as infile: 

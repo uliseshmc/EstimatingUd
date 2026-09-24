@@ -80,7 +80,7 @@ def renamer_noncds_aligned(seqs: AlignedSeqsType) -> AlignedSeqsType:
     return seqs.take_seqs(list(name_map.values()))
 
 @define_app
-def gethumanseq_cds_unaligned(seqs: UnalignedSeqsType, motif_length: int = 1) -> SeqType:
+def gethumanseq_cds_unaligned(seqs: UnalignedSeqsType) -> SeqType:
     """
     A function to get human sequence for a cds unaligned sequences collection.
     """
@@ -91,10 +91,6 @@ def gethumanseq_cds_unaligned(seqs: UnalignedSeqsType, motif_length: int = 1) ->
     seqs = seqs.renamed_seqs(lambda x: name_map.get(x.split("-")[0], x))
     humanaln = seqs.take_seqs(list(name_map.values()))
     humanseq = humanaln.seqs["Human"]
-    
-    multiplier = int(np.floor(len(humanseq) / motif_length))
-    # Keep only complete motifs of length n by dropping the last n-1 bases
-    humanseq = humanseq[: motif_length * multiplier]
 
     return humanseq
 
@@ -180,11 +176,10 @@ def human_seq_length(aln: AlignedSeqsType) -> int:
 
 #Count the number of motifs on a sequence 
 @define_app
-def number_of_motifs(aln: AlignedSeqsType) -> collections.Counter:
-    seq = str(aln.get_gapped_seq("Human"))
-
+def number_of_motifs(seq: SeqType, motif_length: int) -> collections.Counter:
+    str_seq = str(seq)
     triplet_counts = Counter(
-        seq[i:i+3] for i in range(len(seq) - 2)
+        str_seq[i:i+motif_length] for i in range(len(str_seq) - (motif_length-1))
     )
 
     return triplet_counts

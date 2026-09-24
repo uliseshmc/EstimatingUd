@@ -32,6 +32,29 @@ estimating_constraint_5.py
 ```
 This script will produce a series of csv files on the output_data/ folder. The files *ENS.csv, *constraint.csv contain raw estimates of the ENS and constraint per genomic region and chromosome. The files *constraint_mean_sem.csv contain the mean and standard deviation accross chromosomes for each region.
 
+# Estimating mutability
+
+Run
+```
+estimating_mutrates.ipynb
+```
+
+# Estimating mutation rates and sequence length
+
+Run
+change name!
+```
+plot_mutability.ipynb
+```
+
+# Estimating Uobs
+
+Run
+#change name
+```
+Ud_estimation.ipynb
+```
+
 ## Bash mode
 
 If using a cluster that runs under a SLURM system, you can use bash*.sh files to run filtering for all regions through all seqids.

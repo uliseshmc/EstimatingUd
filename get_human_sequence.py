@@ -9,23 +9,23 @@ import os
 CHROMOSOMES = [str(i) for i in range(1, 23)] + ["X", "Y"]
 REGIONS = ["cds", "intronsAR", "introns3UTR", "introns5UTR", "introns_nonUTR", "intergenicAR", "distalIG", "proximal5IG", "proximal3IG"]
 
-def gethumanseqs_cds(mut_motif_length):
+def gethumanseqs_cds():
     loader = get_app("load_unaligned", moltype="dna")
-    get_human_seq = libs.gethumanseq_cds_unaligned(motif_length=mut_motif_length)
+    get_human_seq = libs.gethumanseq_cds_unaligned()
     
     cds_app = loader + get_human_seq
 
     return cds_app
 
-def gethumanseqs_noncds(mut_motif_length):
+def gethumanseqs_noncds():
     loader = get_app("load_aligned", moltype="dna")
-    get_human_seq = libs.gethumanseq_noncds_aligned(motif_length=mut_motif_length)
+    get_human_seq = libs.gethumanseq_noncds_aligned()
     
     noncds_app = loader + get_human_seq
 
     return noncds_app
 
-def gethumanseqs_introns(region, mut_motif_length):
+def gethumanseqs_introns(region):
     loader = get_app("load_aligned", moltype="dna")
     rename_noncds = libs.renamer_noncds_aligned()
     if region == "introns5UTR":
@@ -37,7 +37,7 @@ def gethumanseqs_introns(region, mut_motif_length):
     else:
         raise ValueError("Trying to filter an intron region other than introns3UTR, introns5UTR, or introns_nonUTR")
 
-    get_human_seq = libs.gethumanseq_noncds_aligned(motif_length=mut_motif_length)
+    get_human_seq = libs.gethumanseq_noncds_aligned()
 
     introns_app = loader + rename_noncds + get_region + get_human_seq
     return introns_app
@@ -63,13 +63,7 @@ def get_folder_in(genomic_region, chrom):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-mutmotif",
-        "--mutationmotiflength",
-        type=int,
-        required=True,
-        help="Length of the motifs for the mutation model",
-    )
+
     parser.add_argument(
         "-chrm",
         "--chromosome",
@@ -94,10 +88,10 @@ def main():
         folder_out = paths.DATA_HUMCHIMPORANGOR114 + relative_folder_out
         os.makedirs(folder_out, exist_ok=True)
         
-        file_out = folder_out + "/human_seq_motiflength" + str(args.mutationmotiflength) + ".fa"
+        file_out = folder_out + "/human_seq.fa"
         concat_alns.write(file_out)
         
-        with open(folder_out + "/human_seq_motiflength" + str(args.mutationmotiflength) + "_alnstat.txt", mode = "w") as out: 
+        with open(folder_out + "/human_seq_alnstat.txt", mode = "w") as out: 
             out.write("alignment length: " + str(len(concat_alns)))
 
 if __name__ == "__main__":

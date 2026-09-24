@@ -29,4 +29,4 @@ fi
 CHROMOSOME="${CHROMOSOMES[$((TASK_ID - 1))]}"
 echo "Running codon aligner for chromosome $CHROMOSOME"
 
-python3 get_human_sequence.py -chrm "$CHROMOSOME" -mutmotif 3
+python3 get_human_sequence.py -chrm "$CHROMOSOME"
