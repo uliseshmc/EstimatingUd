@@ -5,6 +5,18 @@ Nothing was changed. Items are grouped by how much they affect the numbers curre
 
 ## 0. HIGHEST PRIORITY: repeat masking failed at download time for 5 of 6 non-cds regions (found 2026-09-24)
 
+**UPDATE 2026-10-08: RESOLVED at the download level.** All six `eti alignments` regions were re-downloaded
+(alldata mtime 2026-09-24, zero non-empty `.err` under `bashcommands/logs/`). Re-check on every chromosome
+1-22, X, Y: `?` masks present everywhere; unmasked share of human bases is introns 39-58%, intronsAR 38-52%,
+intergenicAR 50-70%, distalIG 26-48%, proximal 34-53%. Per-block comparison of the same gene in `introns` vs
+`intronsAR` on chr1/chr12: ~47% of bases open only in intronsAR, ~47% open only in introns, ~5% masked in both
+(simple repeats/dust), and 0% open in both, i.e. the two downloads are complementary as intended.
+
+Still to do: the `chrm*/` outputs for introns5UTR, introns3UTR, intronsAR, intergenicAR, distalIG,
+proximal5IG, proximal3IG do not exist, and the cds / introns_nonUTR outputs plus every CSV in `output_data/`
+predate the re-download (09-21 to 09-24). Stages 2-5, `get_human_sequence.py`, and the three notebooks must
+be re-run before any number is trusted. Section 0.1 (UTR split) is NOT resolved by the re-download.
+
 Checked the raw `eti alignments` output under `$DATA/<region>/alldata_chrm*/` by counting `?` in the
 homo_sapiens sequence of a random sample of files per chromosome.
 

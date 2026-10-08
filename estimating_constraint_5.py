@@ -167,9 +167,5 @@ def main():
         file_out = "output_data/" + label_out + "_constraint.csv"
         constraint_data.to_csv(file_out, index=False)
 
-        stats = constraint_data.groupby(['Region'])['Constraint'].agg(['mean', 'sem']).unstack()
-        file_out = "output_data/" + label_out + "_constraint_mean_sem.csv"
-        stats.to_csv(file_out, index=False)
-
 if __name__ == "__main__":
     main()

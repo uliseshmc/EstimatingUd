@@ -44,11 +44,11 @@ def gethumanseqs_introns(region):
 
 def get_humanseq_app(genomic_region):
     if genomic_region == "cds":
-        app = gethumanseqs_cds(3)
+        app = gethumanseqs_cds()
     elif (genomic_region == "introns3UTR") | (genomic_region == "introns5UTR") | (genomic_region == "introns_nonUTR"):
-        app = gethumanseqs_introns(genomic_region, 3)
+        app = gethumanseqs_introns(genomic_region)
     else:
-        app = gethumanseqs_noncds(3)
+        app = gethumanseqs_noncds()
 
     return app
 

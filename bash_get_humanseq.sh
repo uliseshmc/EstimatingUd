@@ -27,6 +27,6 @@ if (( TASK_ID < 1 || TASK_ID > ${#CHROMOSOMES[@]} )); then
 fi
 
 CHROMOSOME="${CHROMOSOMES[$((TASK_ID - 1))]}"
-echo "Running codon aligner for chromosome $CHROMOSOME"
+echo "Running getting human sequence for chromosome $CHROMOSOME"
 
 python3 get_human_sequence.py -chrm "$CHROMOSOME"
