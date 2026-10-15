@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../../.conda/envs/Ensembl0.7.9/lib/python3.12/site-packages/cogent3"
+		}
+	],
+	"settings": {}
+}
