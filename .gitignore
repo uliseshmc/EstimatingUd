@@ -1,6 +1,8 @@
 #data folder
 *.pickle
 *.csv
+# Ignore all CSV files except those in the output_data folder and its subfolders
+!**/output_data/**/*.csv
 
 #SLURM exit files
 logs/

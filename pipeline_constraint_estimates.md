@@ -14,12 +14,12 @@ conda activate Ensembl0.7.9
 
 To fit single nucleotide substitution models use 
 ```
-fittinglh_sm_4.py -chrm $chr -submodel singlent
+python3 fittinglh_sm_4.py -chrm $chr -submodel singlent
 ```
 
 To fit trinucleotide substitution models use 
 ```
-fittinglh_sm_4.py -chrm $chr -submodel trinuc
+python3 fittinglh_sm_4.py -chrm $chr -submodel trinuc
 ```
 
 These scripts will produce .pickle files inside a /sm_output folder containing binaries of the substitution models. These binaries will be sensitive to changes on the library environment. Make sure to use the same env throughout to avoid mistakes.
@@ -28,32 +28,18 @@ These scripts will produce .pickle files inside a /sm_output folder containing b
 
 Run
 ```
-estimating_constraint_5.py
+python3 estimating_constraint_5.py
 ```
 This script will produce a series of csv files on the output_data/ folder. The files *ENS.csv, *constraint.csv contain raw estimates of the ENS and constraint per genomic region and chromosome. The files *constraint_mean_sem.csv contain the mean and standard deviation accross chromosomes for each region.
 
-# Estimating mutability
+# Calculating summary statistics and plotting
 
-Run
-```
-estimating_mutrates.ipynb
-```
+We want summary statistics that are interpretable and easy to plot. For this run the notebooks summarystats_constraint.ipynb and summarystats_mutability.ipynb. These notebooks will give you summary statistics files stored on the output_data folder and make some plots.
 
-# Estimating mutation rates and sequence length
+# Calculating Uobs
 
-Run
-change name!
-```
-plot_mutability.ipynb
-```
+Ud_estimation.ipynb notebook combines all summary statistics to plot the proportion of Uobs that falls within each genomic category.
 
-# Estimating Uobs
-
-Run
-#change name
-```
-Ud_estimation.ipynb
-```
 
 ## Bash mode
 

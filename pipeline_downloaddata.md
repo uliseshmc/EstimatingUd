@@ -25,7 +25,7 @@ pip install pandas matplotlib seaborn
 ## Downloading and installing the alignments
 ```
 conda activate Ensembl0.7.9
-eti download -c HumChimpOran_10_115.cfg
+eti download -c HumChimpOran_10_114.cfg
 cd HumChimpOran_10_114
 eti install -d download -np <insert number>
 ```
