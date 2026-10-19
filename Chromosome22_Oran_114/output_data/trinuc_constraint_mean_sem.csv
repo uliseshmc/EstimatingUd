@@ -1,0 +1,17 @@
+,Region,0
+mean,cds,0.5785423982716705
+mean,distalIG,-0.0065183151889453
+mean,introns3UTR,0.3866831896258216
+mean,introns5UTR,0.3766602067821989
+mean,intronsAR,0.1521826595462727
+mean,introns_nonUTR,0.248554117736523
+mean,proximal3IG,0.1516572711342954
+mean,proximal5IG,0.1386789649763334
+sem,cds,
+sem,distalIG,
+sem,introns3UTR,
+sem,introns5UTR,
+sem,intronsAR,
+sem,introns_nonUTR,
+sem,proximal3IG,
+sem,proximal5IG,
