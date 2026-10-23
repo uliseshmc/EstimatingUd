@@ -13,6 +13,10 @@ command -v ud >/dev/null || { echo "ud is not on PATH: run 'pip install -e .' in
 
 # sbatch copies the script to its spool dir, so $0 is useless; SLURM_SUBMIT_DIR is where sbatch ran
 cd "${SLURM_SUBMIT_DIR:-$PWD}"
+# fall back to <repo>/.env when the data root is not exported (same rule as estimating_ud.config)
+if [ -z "${DATA_HUMCHIMPORANGOR114:-}" ] && [ -f .env ]; then
+    set -a; . ./.env; set +a
+fi
 : "${DATA_HUMCHIMPORANGOR114:?export DATA_HUMCHIMPORANGOR114=<alignment download root> before sbatch}"
 
 CHROMOSOMES=(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y)

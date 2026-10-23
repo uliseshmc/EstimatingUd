@@ -8,7 +8,8 @@ The analysis code is an installable package under `src/estimating_ud/` with a Cl
 command line, `ud`. Visualisation and summary statistics live in `notebooks/`, SLURM
 wrappers in `scripts/`, tables and figures in `results/`. The alignments themselves
 (terabytes) stay outside the repository; every command finds them through the
-`DATA_HUMCHIMPORANGOR114` environment variable.
+`DATA_HUMCHIMPORANGOR114` environment variable, or through a `.env` file in the repo
+root when the variable is not exported.
 
 ```
 pyproject.toml            package metadata and dependency pins
@@ -34,7 +35,7 @@ micromamba activate Udenv
 pip install --no-deps -r requirements-udenv.txt   # exact versions; see pyproject.toml for why --no-deps
 pip install --no-deps -e .
 python -m ipykernel install --user --name Udenv
-export DATA_HUMCHIMPORANGOR114=/path/to/HumChimpOranGor_10_114
+cp .env.example .env   # then edit: DATA_HUMCHIMPORANGOR114=/path/to/HumChimpOranGor_10_114
 pytest
 ```
 

@@ -21,8 +21,9 @@ filtering or model-fitting logic.
     dinucleotide models. **Keep the two modules separate**: both define `make_gn_preds` and friends
     with different bodies, and merging them silently changes the trinucleotide models.
   - `regions.py`: chromosome / submodel / region lists and every on-disk path helper.
-  - `config.py`: `data_root()` from `DATA_HUMCHIMPORANGOR114`, `results_dir()` resolved from the
-    repo (override with `ESTIMATING_UD_RESULTS`), never from the CWD.
+  - `config.py`: `data_root()` from `DATA_HUMCHIMPORANGOR114`, falling back to `<repo>/.env`
+    (gitignored; `.env.example` is the template) so notebooks work however the kernel was started;
+    `results_dir()` resolved from the repo (override with `ESTIMATING_UD_RESULTS`), never from the CWD.
   - `stages/`: one module per stage with a plain `run(...)` function; `cli.py` only parses options.
 - `scripts/slurm/` (stage wrappers) and `scripts/download/` (eti wrappers) are `--array=1-24` jobs;
   `scripts/submit.sh` creates `logs/` and calls sbatch. Both `_env.sh` files activate `Udenv`,

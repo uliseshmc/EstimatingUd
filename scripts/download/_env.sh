@@ -12,6 +12,10 @@ micromamba activate Udenv
 command -v eti >/dev/null || { echo "eti is not on PATH in Udenv" >&2; exit 1; }
 
 cd "${SLURM_SUBMIT_DIR:-$PWD}"
+# fall back to <repo>/.env when the data root is not exported (same rule as estimating_ud.config)
+if [ -z "${DATA_HUMCHIMPORANGOR114:-}" ] && [ -f .env ]; then
+    set -a; . ./.env; set +a
+fi
 DATA="${DATA_HUMCHIMPORANGOR114:?export DATA_HUMCHIMPORANGOR114=<alignment download root> before sbatch}"
 DATA="${DATA%/}"
 

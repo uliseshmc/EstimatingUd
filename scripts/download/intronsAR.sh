@@ -5,8 +5,8 @@
 #SBATCH --array=1-24
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --mem=80gb
-#SBATCH --time=5-00:00:00
+#SBATCH --mem=16gb
+#SBATCH --time=2-00:00:00
 #SBATCH --account=masel
 #SBATCH --partition=standard
 # Submit from the repo root with scripts/submit.sh. Needs $DATA_HUMCHIMPORANGOR114/install

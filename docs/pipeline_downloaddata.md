@@ -28,12 +28,16 @@ installed with `--no-deps` because two of its pins are ones pip's resolver would
 
 `pip check` reports both version conflicts. That is expected.
 
-Set the alignment root once per shell (or in `~/.bashrc`); every `ud` command, notebook
-and wrapper reads it:
+Tell the pipeline where the alignments are, once. Copy `.env.example` to `.env` in the repo
+root and set the path there:
 
 ```
-export DATA_HUMCHIMPORANGOR114=/xdisk/masel/uliseshmc/EstimatingUd/HumChimpOranGor_10_114
+DATA_HUMCHIMPORANGOR114=/xdisk/masel/uliseshmc/EstimatingUd/HumChimpOranGor_10_114
 ```
+
+`.env` is gitignored. Every `ud` command, notebook, `scripts/submit.sh` and SLURM wrapper reads
+it when the `DATA_HUMCHIMPORANGOR114` variable is not already exported; exporting it in
+`~/.bashrc` works too and takes precedence.
 
 ## Downloading and installing the alignments
 

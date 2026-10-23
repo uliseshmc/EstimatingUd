@@ -5,6 +5,10 @@
 set -euo pipefail
 script=${1:?usage: scripts/submit.sh <wrapper.sh> [sbatch args]}; shift
 [ -f pyproject.toml ] || { echo "run from the repo root" >&2; exit 1; }
+# fall back to <repo>/.env when the data root is not exported (same rule as estimating_ud.config)
+if [ -z "${DATA_HUMCHIMPORANGOR114:-}" ] && [ -f .env ]; then
+    set -a; . ./.env; set +a
+fi
 : "${DATA_HUMCHIMPORANGOR114:?export DATA_HUMCHIMPORANGOR114=<alignment download root>}"
 mkdir -p logs
 sbatch --export=ALL "$@" "$script"
