@@ -1,8 +1,8 @@
 # Installation
-## Conda Environment setup
+## micromamba  Environment setup
 ```
-conda create -n Ensembl0.7.9 python=3.12.14
-conda activate Ensembl0.7.9
+micromamba  create -n Ensembl0.7.9 python=3.14.7
+micromamba activate Ensembl0.7.9
 ```
 
 ## Installing cogent3 and ensembl_tui
@@ -11,7 +11,7 @@ We start by installing ensembl tui and cogent3 packages
 ```
 pip install "ensembl_tui==0.7.9"
 ```
-Please check that the package versions are cogent3==2026.9.10, cogent3-h5seqs==0.7.3 using
+Please check that the package versions are cogent3==2026.10.22, cogent3-h5seqs==0.9.1 using
 ```
 pip freeze
 ```
@@ -19,12 +19,13 @@ pip freeze
 ## Installation of other libraries
 We also need this libraries
 ```
-pip install pandas matplotlib seaborn
+pip install pandas matplotlib seaborn 
+micromamba install -c micromamba -forge click
 ```
 
 ## Downloading and installing the alignments
 ```
-conda activate Ensembl0.7.9
+micromamba  activate Ensembl0.7.9
 eti download -c HumChimpOran_10_114.cfg
 cd HumChimpOran_10_114
 eti install -d download -np <insert number>
@@ -32,6 +33,7 @@ eti install -d download -np <insert number>
 -np is number of processors
 
 if a previous installation fails you can use -f to force the installation
+
 
 # Analysis of genomic regions
 
