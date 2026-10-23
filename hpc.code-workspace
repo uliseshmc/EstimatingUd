@@ -4,7 +4,7 @@
 			"path": "."
 		},
 		{
-			"path": "../../../.conda/envs/Ensembl0.7.9/lib/python3.12/site-packages/cogent3"
+			"path": "../../../.conda/envs/cog2026.10.22_En0.7.9/lib/python3.12/site-packages/cogent3"
 		}
 	],
 	"settings": {}

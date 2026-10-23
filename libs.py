@@ -1,6 +1,7 @@
 import cogent3
+from cogent3 import get_app, make_aligned_seqs
 # needed: binds the cogent3.app.composable submodule used by the decorators below
-from scinexus.composable import define_app
+from scinexus.composable import NotCompleted, define_app
 
 from cogent3.app.typing import AlignedSeqsType
 from cogent3.app.typing import UnalignedSeqsType
@@ -186,7 +187,6 @@ def number_of_motifs(seq: SeqType, motif_length: int) -> collections.Counter:
 
 #Next functions define a dinucleotide substitution model. This model is useful for CpG evolution sites. 
 #The way to call the model is by using 
-# subsmodel = c3.get_app("model", GDN_CpG_ss(), time_het="max", show_progress=True, optimise_motif_probs=True)
 def make_gn_preds():
     # making the model parameters (predictates) for
     # the General Nucleotide Markov model
@@ -230,4 +230,40 @@ def GDN_CpG(**kwargs):
     kwargs=dict(predicates=asym_preds, optimise_motif_probs=True, name="GDN_CpG")
     return _make_model(NonReversibleDinucleotide, **kwargs)
 
+
+#Filtering alignments based on alignment quality
+@define_app
+def filter_windows_spscore(
+    aln: AlignedSeqsType,
+    window: int = 60,
+    threshold_filter: float = 0.5,
+    calc: str = "JC69",
+    gap_insert: float = 12.0,
+    gap_extend: float = 1.0,
+) -> AlignedSeqsType:
+    """Keep the non-overlapping windows of `window` columns whose sp_score is above
+    the threshold alignment score, joined end to end.
+
+    threshold_filter is the fraction of one sequence's window that must be
+    non-gap, with the other sequences identical and gap-free, for the window to
+    count as good; the threshold score is the sp_score of that alignment. The
+    trailing partial window is dropped. Returns NotCompleted when no window passes.
+    """
+    sp_score = get_app("sp_score", calc=calc, gap_insert=gap_insert, gap_extend=gap_extend)
+
+    # threshold alignment with the same number of sequences and names as `aln`
+    n_non_gap = round(window * threshold_filter)
+    seqs = {name: "A" * window for name in aln.names}
+    seqs[aln.names[-1]] = "A" * n_non_gap + "-" * (window - n_non_gap)
+    threshold_score = sp_score(make_aligned_seqs(seqs, moltype="dna"))
+
+    kept = []
+    for start in range(0, len(aln) - window + 1, window):
+        score = sp_score(aln[start : start + window])
+        if isinstance(score, float) and score > threshold_score:
+            kept.append(np.arange(start, start + window))
+
+    if not kept:
+        return NotCompleted("FAIL", "filter_windows_spscore", "no window above the sp_score threshold", source=aln)
+    return aln.take_positions(np.concatenate(kept))
 

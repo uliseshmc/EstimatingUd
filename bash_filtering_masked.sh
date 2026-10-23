@@ -1,21 +1,21 @@
 #!/bin/bash
 #SBATCH --job-name=filtering_3
-#SBATCH --output=logs_filtering/filtering_3_%A_%a.out
-#SBATCH --error=logs_filtering/filtering_3_%A_%a.err
+#SBATCH --output=logs_filtering_masked/filtering_%A_%a.out
+#SBATCH --error=logs_filtering_masked/filtering_%A_%a.err
 #SBATCH --array=1-24
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --mem=60gb
+#SBATCH --mem=20gb
 #SBATCH --time=4:00:00
 #SBATCH --account=masel
 #SBATCH --partition=standard
 
 # Create logs directory
-mkdir -p logs_filtering/
+mkdir -p logs_filtering_masked/
 
 # Initialize conda (using the safer shell.bash hook approach)
 eval "$(conda shell.bash hook)"
-conda activate Ensembl0.7.9
+conda activate cog2026.10.22_En0.7.9
 
 CHROMOSOMES=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21" "22" "X" "Y")
 
@@ -30,4 +30,4 @@ CHROMOSOME="${CHROMOSOMES[$((TASK_ID - 1))]}"
 
 echo "Running filtering for region=$REGION chromosome=$CHROMOSOME"
 
-python3 filtering_masked_nointrons.py -chrm "$CHROMOSOME"
+python3 filtering_databank_masked_nointrons.py -chrm "$CHROMOSOME"

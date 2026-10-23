@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#This code was run using the environment cog2026.10.22_En0.7.9
 import cogent3
 from cogent3 import get_app
 import paths
@@ -37,7 +37,7 @@ def main():
         folder_in = paths.DATA_HUMCHIMPORANGOR114 + relative_folder_in
         in_dstore = cogent3.open_data_store(folder_in, suffix='fa', mode='r')
 
-        relative_folder_out = genomic_region + "/nonmaksed_alldata_chrm" + args.chromosome
+        relative_folder_out = genomic_region + "/nonmasked_alldata_chrm" + args.chromosome
         folder_out = paths.DATA_HUMCHIMPORANGOR114 + relative_folder_out
 
         os.makedirs(folder_out, exist_ok=True)
