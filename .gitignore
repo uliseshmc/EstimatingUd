@@ -1,10 +1,11 @@
-#data folder
+# data folder
 *.pickle
 *.csv
-# Ignore all CSV files except those in the output_data folder and its subfolders
+# CSV tables are tracked only under results/tables/ (and the archived output_data/ folders)
+!results/tables/**/*.csv
 !**/output_data/**/*.csv
 
-#SLURM exit files
+# SLURM logs
 logs/
 logs*
 
