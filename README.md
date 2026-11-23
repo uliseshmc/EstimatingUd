@@ -55,4 +55,5 @@ ud quality --help                                    # alignment-quality branch
 Repeat stages 1 to 4 with `--submodel trinuc`. On the cluster, submit the wrappers from the
 repo root: `scripts/submit.sh scripts/slurm/04_fit.sh`. The full order, from download to
 Ud, is in `docs/pipeline_downloaddata.md`, `docs/pipeline_filtering.md` and
-`docs/pipeline_constraint_estimates.md`.
+`docs/pipeline_constraint_estimates.md`. The alignment-quality side branch (`ud quality`) is
+described in `docs/pipeline_qualityaligned.md`.

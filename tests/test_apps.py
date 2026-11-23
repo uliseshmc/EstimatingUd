@@ -37,10 +37,11 @@ def test_utr_samplers_cut_at_mask_boundaries():
     assert "?" not in str(utr3.get_gapped_seq("Human"))
 
 
-def test_human_seq_truncated_to_whole_motifs():
+def test_human_seq_keeps_full_length():
+    # no truncation to whole trinucleotides: notebook 03 counts overlapping triplets
     aln = make_aligned_seqs(noncds_records(length=301), moltype="dna")
-    seq = apps.gethumanseq_noncds_aligned(motif_length=3)(aln)
-    assert len(seq) == 300
+    seq = apps.gethumanseq_noncds_aligned()(aln)
+    assert len(seq) == 301
     # the app returns the bare sequence; stages.human_seq re-wraps it with name="Human"
 
 

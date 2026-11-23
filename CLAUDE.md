@@ -68,11 +68,13 @@ ud human-seq      --chrm $chr                       # all 9 regions -> human_seq
 ud fit            --chrm $chr --submodel singlent   # stage 4: fit + pickle, all 9 regions
 ud constraint                                       # stage 5: both submodels, chr 1-22 + X
 ud quality <masked-databank|masked-concat|filter-spscore|fit-spscore> --chrm $chr [--window 60 --threshold 0.5]
+ud quality ens-spscore [--window 60 --threshold 0.5]  # chr 1-22 + X, after fit-spscore
 ```
 
 `-chrm`/`-submodel` single-dash forms are accepted aliases. Repeat stages 1-4 with
 `--submodel trinuc`; the submodel only changes `omit_degenerates(motif_length=1|3)` and the output
-label. There is no motif-length option on `human-seq`: it always truncates to whole trinucleotides.
+label. `human-seq` has no motif-length option and writes the full Human sequence, untruncated:
+notebook 03 counts overlapping triplets, so whole-motif truncation would not matter.
 
 | Stage | Writes under `$DATA_HUMCHIMPORANGOR114/<region>/chrm<chr>/` |
 | --- | --- |
@@ -80,7 +82,7 @@ label. There is no motif-length option on `human-seq`: it always truncates to wh
 | human-seq | `human_seq.fa` + `human_seq_alnstat.txt` |
 | 4 | `sm_output/singlent_lh.pickle` or `sm_output/trinucleotide_lh.pickle` (`trinucleotide`, not `trinuc`) |
 | 5 | `results/tables/{singlent,trinuc}_ENS.csv` and `_constraint.csv` |
-| quality | `nonmasked_alldata_chrm<chr>/`, `singlent_nomasked.fa`, `quality_aligned_chrm<chr>/trinucleotide_filtered_window<W>_qualitythreshold<T>.fa` (+ `sm_output/`) |
+| quality | `nonmasked_alldata_chrm<chr>/`, `singlent_nomasked.fa`, `quality_aligned_chrm<chr>/trinucleotide_filtered_window<W>_qualitythreshold<T>.fa`, `sm_output/trinucleotide_lh_window<W>_qualitythreshold<T>.pickle`; `ens-spscore` writes `results/tables/trinuc_ENS_spscore_window<W>_qualitythreshold<T>.csv` |
 
 Raw `eti` output in `<region>/alldata_chrm<chr>/` can be tarred and deleted once stages 1-3 and
 `human-seq` have run.

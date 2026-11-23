@@ -55,8 +55,8 @@ ud filter-noncds --chrm $chr --submodel trinuc
 ## Human sequence per region
 
 The mutability model (`notebooks/03_estimating_mutrates.ipynb`) needs the unaligned
-Human sequence of every region, concatenated per chromosome and truncated to whole
-trinucleotides. The intron regions are sampled exactly as in stage 2 first.
+Human sequence of every region, concatenated per chromosome at full length (no truncation
+to whole trinucleotides; the notebook counts overlapping triplets). The intron regions are sampled exactly as in stage 2 first.
 
 ```
 ud human-seq --chrm $chr

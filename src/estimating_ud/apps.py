@@ -96,9 +96,10 @@ def gethumanseq_cds_unaligned(seqs: UnalignedSeqsType) -> SeqType:
     return humanseq
 
 @define_app
-def gethumanseq_noncds_aligned(seqs: AlignedSeqsType, motif_length: int = 1) -> SeqType:
+def gethumanseq_noncds_aligned(seqs: AlignedSeqsType) -> SeqType:
     """
     A function to get human sequence for noncds aligned sequences collection.
+    The full sequence is returned; no truncation to whole motifs.
     """
     name_map = {
         "homo_sapiens": "Human"
@@ -107,13 +108,8 @@ def gethumanseq_noncds_aligned(seqs: AlignedSeqsType, motif_length: int = 1) -> 
     seqs = seqs.renamed_seqs(lambda x: name_map.get(x.split(":")[0], x))
     humanaln = seqs.take_seqs(list(name_map.values()))
     humanseq = humanaln.seqs["Human"]
-    humanseq = humanseq.seq
 
-    multiplier = int(np.floor(len(humanseq) / motif_length))
-    # Keep only complete motifs of length motif_length by dropping the trailing bases
-    humanseq = humanseq[: motif_length * multiplier]
-
-    return humanseq
+    return humanseq.seq
 
 #Alignments that use the next 3 apps need to be renamed using the apps above
 #These apps sample UTR 5', or UTR 3' regions from intron alignments.

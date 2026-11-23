@@ -44,6 +44,10 @@ CONSTRAINT_REGIONS = [r for r in REGIONS if r != "intergenicAR"]
 NEUTRAL_REGION = "intergenicAR"
 MASKED_REGIONS = ["intergenicAR", "intronsAR", "distalIG"]
 QUALITY_REGIONS = ["intergenicAR"]
+# sp_score window (columns, keep it a multiple of 3) and threshold fraction; the q2/q3 SLURM
+# wrappers hard-code the same values
+QUALITY_WINDOW = 60
+QUALITY_THRESHOLD = 0.5
 
 
 def check_submodel(submodel: str) -> str:

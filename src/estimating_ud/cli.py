@@ -12,7 +12,7 @@ from pathlib import Path
 import click
 
 from estimating_ud.config import DATA_ENV, RESULTS_ENV, results_dir
-from estimating_ud.regions import CHROMOSOMES, CHROMOSOMES_NO_Y, SUBMODELS
+from estimating_ud.regions import CHROMOSOMES, CHROMOSOMES_NO_Y, QUALITY_THRESHOLD, QUALITY_WINDOW, SUBMODELS
 
 
 def chrm_option(f):
@@ -45,10 +45,12 @@ def data_root_option(f):
 
 
 def window_options(f):
-    f = click.option("--window", default=60, show_default=True, type=int, help="Window size in alignment columns.")(f)
+    f = click.option(
+        "--window", default=QUALITY_WINDOW, show_default=True, type=int, help="Window size in alignment columns."
+    )(f)
     return click.option(
         "--threshold",
-        default=0.5,
+        default=QUALITY_THRESHOLD,
         show_default=True,
         type=float,
         help="Fraction of one species' window that must be non-gap for the threshold alignment.",
@@ -203,3 +205,29 @@ def fit_spscore(chrm, data_root, window, threshold):
 
     for path in stage.fit_spscore(chrm, data_root, window, threshold):
         click.echo(path)
+
+
+@quality.command("ens-spscore")
+@data_root_option
+@window_options
+@click.option(
+    "--chrm",
+    "chromosomes",
+    multiple=True,
+    type=click.Choice(CHROMOSOMES_NO_Y),
+    default=CHROMOSOMES_NO_Y,
+    help="Chromosome(s) to include; repeatable. Default: 1-22 and X.",
+)
+@click.option(
+    "--results-dir",
+    "results",
+    type=click.Path(file_okay=False, path_type=Path),
+    default=None,
+    help=f"Where to write the table. Defaults to <repo>/results/tables or ${RESULTS_ENV}/tables.",
+)
+def ens_spscore(data_root, window, threshold, chromosomes, results):
+    """ENS of every fit-spscore pickle (writes results/tables/trinuc_ENS_spscore_*.csv)."""
+    from estimating_ud.stages import quality as stage
+
+    tables_dir = (Path(results) / "tables") if results else results_dir("tables")
+    click.echo(stage.write_ens_spscore(data_root, tables_dir, window, threshold, chromosomes))

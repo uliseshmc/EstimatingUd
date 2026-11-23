@@ -32,6 +32,15 @@ from the second. Document the choice or unify.
 chromosomes with a plain mean, so small high-mutability chromosomes are over-weighted. Use a
 site-weighted mean across chromosomes or say so.
 
+### The quality-branch fit is only compared with intergenicAR itself
+`ud quality ens-spscore` and `notebooks/exploratory/ens_quality_aligned.ipynb` (2026-10-26) compare
+the ENS of the sp_score-filtered intergenicAR fit with the stage 4 fit of the same region. The
+branch's motivation is the neutral reference every constraint is measured against, so the next
+step is to recompute each region's constraint under the quality `Q_igar`
+(`stages.constraint.region_ens` with the quality pickle). Also, the stage 3 and quality-branch
+filters keep different column sets around masked runs and gaps, so a same-pipeline baseline
+(`--threshold 0`) would separate the window selection from the filter difference.
+
 ### The "CpG" scale in both trinucleotide models is bound to omega
 `models.py`: `ssym_preds = gn + cpg + omega` then `cpgdecay = ssym_preds[-1]`, which is omega.
 `scales["CpG"]` is really "nonsynonymous". Stage 5 uses `expected_number_subs` and never reads the
@@ -53,7 +62,8 @@ mislabelled quantities. Fix is `ssym_preds[-2]`, but it is a model change: decid
   `stages/constraint.py`; covered by `tests/test_stages.py`.
 - Mean/SEM CSV layout: stage 5 no longer writes mean/sem files; the notebooks do, and
   `05_Ud_estimation.ipynb` now filters both `*_mean_sem.csv` files to their mean rows.
-- `-mutmotif` flag that was ignored: removed; `ud human-seq` always truncates to whole trinucleotides.
+- `-mutmotif` flag that was ignored: removed, along with the extractor's `motif_length` argument,
+  which was never set and so never truncated anything. `ud human-seq` writes the full Human sequence.
 - Stale docs (`DATA_HUMCHIMPORANG115`, `filtered.fa`, `plot_*.ipynb`, coordinate file names),
   wrappers echoing unset variables, the `environment.yml` from an older env, `*.csv` ignored
   everywhere: rewritten.

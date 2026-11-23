@@ -5,7 +5,7 @@ from estimating_ud.cli import main
 COMMANDS = [
     ["align-cds"], ["filter-introns"], ["filter-noncds"], ["human-seq"], ["fit"], ["constraint"],
     ["quality"], ["quality", "masked-databank"], ["quality", "masked-concat"],
-    ["quality", "filter-spscore"], ["quality", "fit-spscore"],
+    ["quality", "filter-spscore"], ["quality", "fit-spscore"], ["quality", "ens-spscore"],
 ]
 
 
