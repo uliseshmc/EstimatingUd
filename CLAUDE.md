@@ -14,13 +14,15 @@ filtering or model-fitting logic.
 ## Layout
 
 - `src/estimating_ud/` is the only code that matters.
-  - `apps.py`: cogent3 composable apps (species renamers, UTR samplers, Human-sequence extractors,
+  - `apps.py`: cogent3 composable apps (species renamers, Human-sequence extractors,
     motif counter, `filter_windows_spscore`).
   - `models.py`: `GNC_CpG_ss` (codon states, cds) and `GT_CpG_ss` (64 trinucleotide states, non-cds),
     registered with cogent3 when the package is imported. `dinuc_models.py` holds the `GDN_CpG*`
     dinucleotide models. **Keep the two modules separate**: both define `make_gn_preds` and friends
     with different bodies, and merging them silently changes the trinucleotide models.
   - `regions.py`: chromosome / submodel / region lists and every on-disk path helper.
+  - `genic_coords.py`: where utr5, utr3 and introns lie, from the installed annotation; `ud genic-coords`
+    writes the `--ref_coords` tables to `$DATA/genic_coordinates/`.
   - `config.py`: `data_root()` from `DATA_HUMCHIMPORANGOR114`, falling back to `<repo>/.env`
     (gitignored; `.env.example` is the template) so notebooks work however the kernel was started;
     `results_dir()` resolved from the repo (override with `ESTIMATING_UD_RESULTS`), never from the CWD.
@@ -62,8 +64,8 @@ Do not download anything from Ensembl or any other data repository, not even sma
 ```
 export DATA_HUMCHIMPORANGOR114=/path/to/HumChimpOranGor_10_114
 ud align-cds      --chrm $chr --submodel singlent   # stage 1: cds only
-ud filter-introns --chrm $chr --submodel singlent   # stage 2: introns5UTR introns3UTR introns_nonUTR
-ud filter-noncds  --chrm $chr --submodel singlent   # stage 3: intergenicAR intronsAR distalIG proximal5IG proximal3IG
+ud genic-coords                                     # before the utr5/utr3/introns downloads: $DATA/genic_coordinates/
+ud filter-noncds  --chrm $chr --submodel singlent   # stage 3: every non-cds region, utr5 utr3 introns included (no stage 2)
 ud human-seq      --chrm $chr                       # all 9 regions -> human_seq.fa
 ud fit            --chrm $chr --submodel singlent   # stage 4: fit + pickle, all 9 regions
 ud constraint                                       # stage 5: both submodels, chr 1-22 + X
@@ -106,7 +108,8 @@ are committed with outputs (nbstripout runs with `--keep-output`; it strips exec
 Submit from the repo root: `scripts/submit.sh scripts/slurm/04_fit.sh`. Logs go to
 `logs/<jobname>_<jobid>_<task>.{out,err}` (gitignored). The download wrappers print a mask report
 after each `eti alignments`; a chromosome where almost every fragment lacks `?` was downloaded
-without masking and must be redone. `AttributeError: 'NotCompleted' object has no attribute
+without masking and must be redone (not so for utr5/utr3, whose short pieces mostly contain no
+repeat: judge those by the masked share). `AttributeError: 'NotCompleted' object has no attribute
 'write'` in a `.err` means an input alignment had length 0. `FileNotFoundError` for `cds/chrmY` in
 stage 4 is expected; stage 5 skips Y.
 
@@ -122,6 +125,9 @@ stage 4 is expected; stage 5 skips Y.
   because `GNC_CpG_ss` has no stop states but the intergenicAR matrix does.
 - The `scales["CpG"]` entry in both trinuc models is bound to `omega`, not to the CpG predicate
   (see `docs/todo.md`). Stage 5 never reads the scales, so leave it unless asked.
-- The UTR samplers cut at the first/last `?` in the Human sequence, where both cds and repeats are
-  masked, so "UTR" regions are a few hundred bp at each transcript end (`docs/todo.md` 0.1).
+- `utr5`, `utr3` and `introns` are defined by coordinates (`genic_coords.py`), not by where `?` falls.
+  Their raw folders must hold `homo_sapiens-<chr>-<start>-<stop>` fragments; stage 3 and `human-seq`
+  refuse the earlier per-gene `introns` download. The notebooks, `results/tables` and
+  `docs/pipeline_summary.md` still carry the old classes (introns5UTR, introns3UTR, introns_nonUTR)
+  until the rerun.
 - `.gitignore` ignores `*.csv` except under `results/tables/` and the archived `output_data/` folders.

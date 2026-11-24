@@ -1,7 +1,7 @@
 from cogent3 import make_aligned_seqs, make_unaligned_seqs
 
 from estimating_ud import apps
-from tests.conftest import NAMES, cds_records, intron_records, noncds_records
+from tests.conftest import NAMES, cds_records, noncds_records
 
 
 def test_cds_renamer_splits_on_dash():
@@ -21,20 +21,6 @@ def test_wrong_renamer_drops_everything():
     aln = make_aligned_seqs(noncds_records(), moltype="dna")
     result = apps.renamer_cds_aligned()(aln)
     assert not result  # NotCompleted
-
-
-def test_utr_samplers_cut_at_mask_boundaries():
-    aln = apps.renamer_noncds_aligned()(make_aligned_seqs(intron_records(), moltype="dna"))
-    utr5 = apps.sample_UTR5()(aln)
-    utr3 = apps.sample_UTR3()(aln)
-    body = apps.removeUTRs_fromintrons()(aln)
-    assert len(utr5) == 30  # up to the first '?'
-    assert len(utr3) == 300 - 260  # after the last '?'
-    # aln[first '?' : last '?']: the leading masked run is kept and the trailing one dropped;
-    # the '?' columns are removed later by omit_degenerates, so only the boundaries matter
-    assert len(body) == 259 - 30
-    assert "?" not in str(utr5.get_gapped_seq("Human"))
-    assert "?" not in str(utr3.get_gapped_seq("Human"))
 
 
 def test_human_seq_keeps_full_length():

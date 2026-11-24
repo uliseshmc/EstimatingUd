@@ -44,8 +44,8 @@ pytest
 ```
 ud --help
 ud align-cds      --chrm 22 --submodel singlent      # stage 1 (cds only)
-ud filter-introns --chrm 22 --submodel singlent      # stage 2
-ud filter-noncds  --chrm 22 --submodel singlent      # stage 3
+ud genic-coords                                      # utr5/utr3/gene-span tables, before their download
+ud filter-noncds  --chrm 22 --submodel singlent      # stage 3 (there is no stage 2)
 ud human-seq      --chrm 22                          # Human sequence per region
 ud fit            --chrm 22 --submodel singlent      # stage 4
 ud constraint                                        # stage 5, writes results/tables/

@@ -74,15 +74,27 @@ def align_cds(chrm, submodel, data_root):
     click.echo(stage.run(chrm, submodel, data_root))
 
 
-@main.command("filter-introns")
-@chrm_option
-@submodel_option
+@main.command("genic-coords")
 @data_root_option
-def filter_introns(chrm, submodel, data_root):
-    """Stage 2: sample introns5UTR, introns3UTR and introns_nonUTR from the intron alignments."""
-    from estimating_ud.stages import filter_introns as stage
+@click.option(
+    "--chrm",
+    "chromosomes",
+    multiple=True,
+    type=click.Choice(CHROMOSOMES),
+    default=CHROMOSOMES,
+    help="Chromosome(s) to write; repeatable. Default: 1-22, X and Y.",
+)
+@click.option(
+    "--outdir",
+    type=click.Path(file_okay=False, path_type=Path),
+    default=None,
+    help="Where to write the tables. Defaults to <data root>/genic_coordinates.",
+)
+def genic_coords(data_root, chromosomes, outdir):
+    """Write the utr5, utr3 and merged gene span tables read by eti alignments --ref_coords."""
+    from estimating_ud import genic_coords as stage
 
-    for path in stage.run(chrm, submodel, data_root):
+    for path in stage.run(data_root, chromosomes, outdir):
         click.echo(path)
 
 
@@ -91,7 +103,7 @@ def filter_introns(chrm, submodel, data_root):
 @submodel_option
 @data_root_option
 def filter_noncds(chrm, submodel, data_root):
-    """Stage 3: filter intergenicAR, intronsAR, distalIG, proximal5IG, proximal3IG."""
+    """Stage 3: filter every non-cds region (intergenic classes, intronsAR, utr5, utr3, introns)."""
     from estimating_ud.stages import filter_noncds as stage
 
     for path in stage.run(chrm, submodel, data_root):

@@ -29,10 +29,29 @@ CHRM="${CHROMOSOMES[$((TASK_ID - 1))]}"
 echo "$(date '+%F %T') host=$(hostname) env=Udenv chromosome=$CHRM data_root=$DATA"
 eti --version
 
-# mask_report <outdir>: fraction of fragments with no '?' and the '?' share of the human
+# prepare_outdir <outdir>: refuse to extract into a folder that already holds fragments, unless
+# the job was submitted with REPLACE_EXISTING=1, in which case eti is told to delete the folder
+# first (ETI_FORCE). Mixing two extractions in one folder would silently mix two definitions.
+ETI_FORCE=()
+prepare_outdir() {
+    local dir=$1
+    if [ -d "$dir" ] && [ -n "$(find "$dir" -maxdepth 1 -name '*.fa' -print -quit)" ]; then
+        if [ "${REPLACE_EXISTING:-0}" != 1 ]; then
+            echo "$dir already holds fragments. To DELETE them and extract again, submit with:" >&2
+            echo "    REPLACE_EXISTING=1 scripts/submit.sh <this wrapper>" >&2
+            exit 1
+        fi
+        echo "REPLACE_EXISTING=1: eti will delete $dir before writing"
+        ETI_FORCE=(--force_overwrite)
+    fi
+}
+
+# mask_report <outdir> [short]: fraction of fragments with no '?' and the '?' share of the human
 # sequence over a sample of fragments. A download whose masking failed shows ~100% files
 # without '?' and ~0% masked share (compare: a healthy chromosome has some files without
-# '?' because not every fragment overlaps an annotated repeat).
+# '?' because not every fragment overlaps an annotated repeat). Pass "short" for regions made
+# of short pieces (utr5, utr3): most of their fragments contain no repeat, so only the masked
+# share is informative (chromosome 22: 17% for utr5, 22% for utr3).
 mask_report() {
     local dir=$1 n_total n_nomask
     n_total=$(find "$dir" -maxdepth 1 -name '*.fa' | wc -l)
@@ -42,5 +61,13 @@ mask_report() {
         /^>/ { keep = ($0 ~ /^>homo_sapiens/) ; next }
         keep { masked += gsub(/\?/, ""); total += length($0) }
         END { if (total) printf "mask report: %.1f%% of %d sampled human bases are masked (?)\n", 100*masked/total, total+masked }'
-    [ -d "$dir/not_completed" ] && echo "not_completed records: $(ls "$dir/not_completed" | wc -l)"
+    if [ "${2:-}" = short ]; then
+        echo "mask report: short pieces, so many fragments without '?' is expected; judge by the masked share"
+    fi
+    if [ -d "$dir/not_completed" ]; then
+        echo "not_completed records: $(ls "$dir/not_completed" | wc -l)"
+    fi
+    # always succeed: this is the last command of the wrappers, and a non-zero status here used to
+    # mark finished downloads as FAILED in SLURM whenever there was no not_completed folder
+    return 0
 }

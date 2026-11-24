@@ -2,7 +2,7 @@
 
 Sequence naming mirrors eti output: cds homologs are ``<species>-<gene id>`` (unaligned),
 every other region is ``<species>:<chrom>:<start>-<end>:<strand>`` (aligned). Intron
-fragments carry ``?`` runs in the Human sequence where cds / repeats were masked.
+fragments carry ``?`` runs in the Human sequence where exons / repeats were masked.
 """
 
 from __future__ import annotations
@@ -79,7 +79,11 @@ def data_root(tmp_path_factory) -> Path:
     chrm = "22"
     for i in range(2):
         write_fasta(root / "cds" / f"alldata_chrm{chrm}" / f"gene{i}.fa", cds_records(seed=10 + i))
-        write_fasta(root / "introns" / f"alldata_chrm{chrm}" / f"gene{i}.fa", intron_records(seed=20 + i))
+        # coordinate-defined regions are named by position, as eti alignments --ref_coords writes them
+        write_fasta(
+            root / "introns" / f"alldata_chrm{chrm}" / f"homo_sapiens-{chrm}-{1000 * i}-{1000 * i + 300}.fa",
+            intron_records(seed=20 + i),
+        )
         write_fasta(root / "intergenicAR" / f"alldata_chrm{chrm}" / f"block{i}.fa", noncds_records(seed=30 + i, start=1000 * i))
         write_fasta(root / "distalIG" / f"alldata_chrm{chrm}" / f"block{i}.fa", noncds_records(seed=40 + i, start=1000 * i))
     return root

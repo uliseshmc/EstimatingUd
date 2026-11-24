@@ -3,7 +3,7 @@ from click.testing import CliRunner
 from estimating_ud.cli import main
 
 COMMANDS = [
-    ["align-cds"], ["filter-introns"], ["filter-noncds"], ["human-seq"], ["fit"], ["constraint"],
+    ["align-cds"], ["genic-coords"], ["filter-noncds"], ["human-seq"], ["fit"], ["constraint"],
     ["quality"], ["quality", "masked-databank"], ["quality", "masked-concat"],
     ["quality", "filter-spscore"], ["quality", "fit-spscore"], ["quality", "ens-spscore"],
 ]
@@ -19,7 +19,7 @@ def test_help_of_every_command():
 
 def test_single_dash_aliases_accepted(data_root):
     result = CliRunner().invoke(main, ["filter-noncds", "-chrm", "22", "-submodel", "singlent", "--data-root", str(data_root)])
-    # distalIG and intergenicAR exist in the fixture, the other three regions do not
+    # distalIG, intergenicAR and introns exist in the fixture, the other regions do not
     assert "does not exist" in str(result.exception) or result.exit_code == 0
 
 

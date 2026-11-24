@@ -111,55 +111,6 @@ def gethumanseq_noncds_aligned(seqs: AlignedSeqsType) -> SeqType:
 
     return humanseq.seq
 
-#Alignments that use the next 3 apps need to be renamed using the apps above
-#These apps sample UTR 5', or UTR 3' regions from intron alignments.
-#UTR 5' is everything from the start of the transcript to the first exon (masked on these alignments with '?')
-#UTR 3' is everything from the end of the last exon to the end of the transcript
-@define_app
-def sample_UTR5(aln: AlignedSeqsType) -> AlignedSeqsType:
-    seq = aln.get_gapped_seq("Human")
-
-    try:
-        pos5 = str(seq).index("?")
-    except ValueError:
-        pos5 = None
-
-    UTR5_aln = aln[0:pos5]
-
-    return UTR5_aln
-    
-@define_app
-def sample_UTR3(aln: AlignedSeqsType) -> AlignedSeqsType:
-    seq = aln.get_gapped_seq("Human")
-
-    try:
-        pos3 = str(seq).rindex("?")
-    except ValueError:
-        pos3 = None
-
-    UTR3_aln = aln[pos3+1:]
-
-    return UTR3_aln
-
-#Here I sample introns removing UTRs
-@define_app
-def removeUTRs_fromintrons(aln: AlignedSeqsType) -> AlignedSeqsType:
-    seq = aln.get_gapped_seq("Human")
-
-    try:
-        pos5 = str(seq).index("?")
-    except ValueError:
-        pos5 = None
-
-    try:
-        pos3 = str(seq).rindex("?")
-    except ValueError:
-        pos3 = None
-
-    intron_noUTR = aln[pos5:pos3]
-
-    return intron_noUTR
-
 #Estimate the number of nondegenetare human sites on a sequence
 #Use this app after renaming the human sequences to "Human"
 #We recommend to use this after filtering out degenerate positions 

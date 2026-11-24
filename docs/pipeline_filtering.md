@@ -30,22 +30,17 @@ ud align-cds --chrm $chr --submodel trinuc
 For the trinucleotide models, every trinucleotide with a degenerate position is removed
 rather than every column.
 
-## Stage 2: introns
+## Stage 2 (removed)
 
-The intron alignments are split into introns5UTR (from the transcript start to the first
-masked position in the Human sequence), introns3UTR (after the last masked position) and
-introns_nonUTR (between the two). All three read `introns/alldata_chrm<chr>` and write to
-their own region folder:
+There is no stage 2 any more. It used to cut the intron alignments at the first and last masked
+position into introns5UTR, introns3UTR and introns_nonUTR. utr5, utr3 and introns are now located
+by coordinates and extracted separately (`docs/pipeline_downloaddata.md`), so they go through
+stage 3 like every other non-cds region.
 
-```
-ud filter-introns --chrm $chr --submodel singlent
-ud filter-introns --chrm $chr --submodel trinuc
-```
+## Stage 3: the non-cds regions
 
-## Stage 3: the other non-cds regions
-
-intergenicAR, intronsAR, distalIG, proximal5IG and proximal3IG only need renaming and
-degenerate filtering:
+intergenicAR, intronsAR, distalIG, proximal5IG, proximal3IG, utr5, utr3 and introns only need
+renaming and degenerate filtering:
 
 ```
 ud filter-noncds --chrm $chr --submodel singlent
@@ -56,7 +51,7 @@ ud filter-noncds --chrm $chr --submodel trinuc
 
 The mutability model (`notebooks/03_estimating_mutrates.ipynb`) needs the unaligned
 Human sequence of every region, concatenated per chromosome at full length (no truncation
-to whole trinucleotides; the notebook counts overlapping triplets). The intron regions are sampled exactly as in stage 2 first.
+to whole trinucleotides; the notebook counts overlapping triplets).
 
 ```
 ud human-seq --chrm $chr
@@ -72,7 +67,6 @@ running the singlent then the trinuc invocation. Submit from the repo root so th
 
 ```
 scripts/submit.sh scripts/slurm/01_align_cds.sh
-scripts/submit.sh scripts/slurm/02_filter_introns.sh
 scripts/submit.sh scripts/slurm/03_filter_noncds.sh
 scripts/submit.sh scripts/slurm/03b_human_seq.sh
 ```

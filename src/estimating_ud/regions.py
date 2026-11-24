@@ -8,12 +8,16 @@ The data layout is unchanged from the script generation of the pipeline:
     <data_root>/<region>/chrm<chr>/human_seq.fa        concatenated Human sequence
     <data_root>/<region>/chrm<chr>/sm_output/<fit>_lh.pickle
 
-The three intron regions all read from ``introns/alldata_chrm<chr>`` and differ only in
-the sampler applied.
+``utr5``, ``utr3`` and ``introns`` are located by coordinates (``ud genic-coords``, see
+:mod:`estimating_ud.genic_coords`) and extracted with ``eti alignments --ref_coords``, so their raw
+fragments are named ``homo_sapiens-<chr>-<start>-<stop>[-<i>].fa``. Until 2026-11 the folder
+``introns/alldata_chrm<chr>`` held one fragment per gene (``ENSG...fa``) from which three classes
+were cut at the first and last masked position; :func:`check_coordinate_named` refuses that layout.
 """
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 CHROMOSOMES = [str(i) for i in range(1, 23)] + ["X", "Y"]
@@ -29,16 +33,17 @@ RESULTS_LABEL = {"singlent": "singlent", "trinuc": "trinuc"}
 REGIONS = [
     "cds",
     "intronsAR",
-    "introns3UTR",
-    "introns5UTR",
-    "introns_nonUTR",
+    "utr3",
+    "utr5",
+    "introns",
     "intergenicAR",
     "distalIG",
     "proximal5IG",
     "proximal3IG",
 ]
-INTRON_REGIONS = ["introns3UTR", "introns5UTR", "introns_nonUTR"]
-NONCDS_REGIONS = ["intergenicAR", "intronsAR", "distalIG", "proximal5IG", "proximal3IG"]
+# regions whose location comes from the genic_coordinates tables (ud genic-coords)
+GENIC_REGIONS = ["utr5", "utr3", "introns"]
+NONCDS_REGIONS = ["intergenicAR", "intronsAR", "distalIG", "proximal5IG", "proximal3IG", *GENIC_REGIONS]
 # every region whose constraint is measured against intergenicAR
 CONSTRAINT_REGIONS = [r for r in REGIONS if r != "intergenicAR"]
 NEUTRAL_REGION = "intergenicAR"
@@ -58,9 +63,30 @@ def check_submodel(submodel: str) -> str:
 
 
 def raw_dir(data_root: Path, region: str, chrm: str) -> Path:
-    """Directory of raw eti output for a region; intron regions share ``introns/``."""
-    folder = "introns" if region in INTRON_REGIONS else region
-    return Path(data_root) / folder / f"alldata_chrm{chrm}"
+    """Directory of raw eti output for a region."""
+    return Path(data_root) / region / f"alldata_chrm{chrm}"
+
+
+_COORDINATE_NAMED = re.compile(r"^[A-Za-z_]+-[^-]+-\d+-\d+(-\d+)?$")
+
+
+def check_coordinate_named(folder: Path, region: str) -> None:
+    """Refuse a raw folder of a coordinate-defined region that holds fragments named any other way.
+
+    ``eti alignments --ref_coords`` names its output ``<species>-<chr>-<start>-<stop>[-<i>].fa``.
+    A file such as ``ENSG00000100345.fa`` in ``introns/alldata_chrm<chr>`` is the earlier per-gene
+    download, where coding sequence and repeats were masked but UTR exons were not.
+    """
+    if region not in GENIC_REGIONS:
+        return
+    for path in sorted(Path(folder).glob("*.fa")):
+        if not _COORDINATE_NAMED.match(path.stem):
+            msg = (
+                f"{folder} holds fragments that are not named by coordinates (for example {path.name}). "
+                f"It looks like the per-gene download used before the {region!r} region was defined by "
+                f"coordinates; extract it again with scripts/download/{region}.sh before filtering."
+            )
+            raise ValueError(msg)
 
 
 def region_dir(data_root: Path, region: str, chrm: str) -> Path:

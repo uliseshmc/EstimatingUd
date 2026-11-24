@@ -6,10 +6,11 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --mem=8gb
-#SBATCH --time=4:00:00
+#SBATCH --time=8:00:00
 #SBATCH --account=masel
 #SBATCH --partition=standard
 # Submit from the repo root with scripts/submit.sh (it creates logs/ first).
+# Stage 3 now also filters utr5, utr3 and introns (the former stage 2), hence the longer limit.
 
 source "$SLURM_SUBMIT_DIR/scripts/slurm/_env.sh"
 

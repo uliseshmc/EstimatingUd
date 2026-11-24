@@ -75,26 +75,50 @@ codon-aligns them in stage 1):
 eti homologs -i install/ --outdir cds/alldata_chrm$chr --ref human --coord_names $chr
 ```
 
-## Introns (masking cds and all repeats)
+## UTRs and introns (located by coordinates)
 
-`eti alignments` samples the whole-genome alignment over protein-coding genes of the
-reference species. It needs a file listing the biotypes to mask, one per line. List the
-biotypes available for human with
+The 5' UTR, the 3' UTR and the introns are defined by where the installed annotation puts them, not
+by where masked positions fall in an alignment. Write the location tables once:
 
 ```
-eti species-summary -i install/ --species human
+ud genic-coords
 ```
 
-`cds_allAR_1column.txt` holds every unique entry of the first column of the repeats table
-plus `cds` and `dust`.
+This reads each protein-coding gene's canonical transcript from `install/` and writes, per
+chromosome, into `$DATA_HUMCHIMPORANGOR114/genic_coordinates/`:
+
+- `chrom<chr>_utr5.tsv`, `chrom<chr>_utr3.tsv`: exon sequence outside the coding sequence, 5' or 3'
+  by the gene's strand
+- `chrom<chr>_genes_merged.tsv`: the protein-coding gene spans, overlapping genes merged
+
+Where genes overlap, a position is coding first, then UTR, then intron, so no position is counted
+twice. Positions that are 5' UTR of one gene and 3' UTR of another are in neither UTR table.
+
+The UTRs are extracted with all repeats masked (`allAR_1column.txt`):
+
+```
+eti alignments -i install -od utr5/alldata_chrm$chr --align_name "10_primates.epo" --ref human --mask allAR_1column.txt --ref_coords genic_coordinates/chrom${chr}_utr5.tsv
+eti alignments -i install -od utr3/alldata_chrm$chr --align_name "10_primates.epo" --ref human --mask allAR_1column.txt --ref_coords genic_coordinates/chrom${chr}_utr3.tsv
+```
+
+The introns are the merged gene spans with every exon of the canonical transcripts and all repeats
+masked. The mask list `exons_allAR_1column.txt` is `mrna` followed by `cds_allAR_1column.txt`
+(`cds` plus every unique entry of the first column of the repeats table; list the biotypes with
+`eti species-summary -i install/ --species human`):
+
+```
+{ echo mrna; cat cds_allAR_1column.txt; } > exons_allAR_1column.txt
+eti alignments -i install -od introns/alldata_chrm$chr --align_name "10_primates.epo" --ref human --mask exons_allAR_1column.txt --ref_coords genic_coordinates/chrom${chr}_genes_merged.tsv
+```
+
+The wrappers are `scripts/download/utr5.sh`, `utr3.sh` and `introns.sh`. They refuse to write into
+a folder that already holds fragments; `REPLACE_EXISTING=1 scripts/submit.sh scripts/download/introns.sh`
+deletes the folder first. Until 2026-11 `introns/alldata_chrm<chr>` held one fragment per gene with
+only coding sequence and repeats masked; those folders must be replaced before filtering.
 
 <!-- Bug caution
 eti species-summary outputs two columns for the repeats biotypes. We use all the unique entries in the first column.
 -->
-
-```
-eti alignments -i install -od introns/alldata_chrm$chr --align_name "10_primates.epo" --ref human --mask cds_allAR_1column.txt --coord_names $chr
-```
 
 ## Intronic ancestral repeats
 

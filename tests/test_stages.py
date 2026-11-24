@@ -6,7 +6,7 @@ import pytest
 from cogent3 import load_aligned_seqs, load_unaligned_seqs
 
 from estimating_ud import regions
-from estimating_ud.stages import align_cds, constraint, filter_introns, filter_noncds, fit, human_seq, quality
+from estimating_ud.stages import align_cds, constraint, filter_noncds, fit, human_seq, quality
 
 
 def alnstat(path):
@@ -23,12 +23,30 @@ def test_align_cds_writes_filtered_alignment(data_root, submodel):
     assert alnstat(regions.alnstat_path(data_root, "cds", "22", submodel)) == f"{len(aln):.6e}"
 
 
-def test_filter_introns_samples_three_regions(data_root):
-    outs = filter_introns.run("22", "trinuc", data_root)
-    lengths = {p.parent.parent.name: len(load_aligned_seqs(str(p), moltype="dna")) for p in outs}
-    assert set(lengths) == set(regions.INTRON_REGIONS)
-    assert all(v > 0 and v % 3 == 0 for v in lengths.values())
-    assert lengths["introns_nonUTR"] > lengths["introns5UTR"]
+def test_filter_noncds_drops_masked_columns_of_introns(data_root):
+    # introns arrive with exons and repeats already masked; stage 3 only has to drop those columns
+    (out,) = filter_noncds.run("22", "singlent", data_root, regions=("introns",))
+    aln = load_aligned_seqs(str(out), moltype="dna")
+    text = "".join(str(s) for s in aln.seqs)
+    assert "?" not in text and "-" not in text
+    assert len(aln) == 2 * (300 - 20 - 6)  # two fragments, each with 20 masked and 6 gapped columns
+
+
+def test_filter_noncds_trinuc_introns_keeps_whole_motifs(data_root):
+    (out,) = filter_noncds.run("22", "trinuc", data_root, regions=("introns",))
+    aln = load_aligned_seqs(str(out), moltype="dna")
+    assert len(aln) > 0 and len(aln) % 3 == 0
+
+
+def test_gene_named_intron_fragments_are_refused(tmp_path):
+    # the per-gene download used before introns were defined by coordinates must not be filtered as the new class
+    from tests.conftest import intron_records, write_fasta
+
+    write_fasta(tmp_path / "introns" / "alldata_chrm22" / "ENSG00000100001.fa", intron_records())
+    with pytest.raises(ValueError, match="not named by coordinates"):
+        filter_noncds.run("22", "singlent", tmp_path, regions=("introns",))
+    with pytest.raises(ValueError, match="not named by coordinates"):
+        human_seq.run("22", tmp_path, regions=("introns",))
 
 
 def test_filter_noncds_two_regions(data_root):
@@ -40,7 +58,7 @@ def test_filter_noncds_two_regions(data_root):
 
 
 def test_human_seq_concatenates(data_root):
-    outs = human_seq.run("22", data_root, regions=("cds", "introns_nonUTR", "intergenicAR"))
+    outs = human_seq.run("22", data_root, regions=("cds", "introns", "intergenicAR"))
     for p in outs:
         seq = load_unaligned_seqs(str(p), moltype="dna").seqs["Human"]
         assert len(seq) > 0
